@@ -2881,7 +2881,7 @@ bool Tracking::TrackWithMotionModel()
     if(mSensor==System::STEREO)
         th=7;
     else
-        th=15;
+        th=20;
 
     int nmatches = matcher.SearchByProjection(mCurrentFrame,mLastFrame,th,mSensor==System::MONOCULAR || mSensor==System::IMU_MONOCULAR);
 
@@ -3054,7 +3054,7 @@ bool Tracking::TrackLocalMap()
     }
     else
     {
-        if(mnMatchesInliers<30)
+        if(mnMatchesInliers<20)
             return false;
         else
             return true;
