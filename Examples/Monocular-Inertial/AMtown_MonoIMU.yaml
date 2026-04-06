@@ -1,0 +1,87 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters for AMtown Dataset (DJI drone, 2448x2048, downsampled 0.5x)
+#--------------------------------------------------------------------------------------------
+File.version: "1.0"
+
+Camera.type: "PinHole"
+
+# Camera calibration and distortion parameters (OpenCV)
+# Original: fx=1453.72, fy=1453.28, cx=1172.18, cy=1041.78 @ 2448x2048
+# Downsampled 0.5x in ros_mono_inertial_compressed.cc
+Camera1.fx: 726.86
+Camera1.fy: 726.64
+Camera1.cx: 586.09
+Camera1.cy: 520.89
+
+Camera1.k1: -0.1210
+Camera1.k2: 0.1113
+Camera1.p1: 0.0016
+Camera1.p2: 0.00013
+Camera1.k3: -0.062353
+
+# Camera resolution (after 0.5x downsampling)
+Camera.width: 1224
+Camera.height: 1024
+
+# Camera frames per second
+Camera.fps: 10
+
+# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+Camera.RGB: 1
+
+#--------------------------------------------------------------------------------------------
+# IMU Parameters (DJI onboard IMU, /dji_osdk_ros/imu)
+#--------------------------------------------------------------------------------------------
+
+# T_b_c1 = identity: virtual IMU is co-located with camera
+# The ros_mono_inertial_virtual_imu node transforms body IMU -> camera frame
+# so ORB-SLAM3 sees a "virtual IMU" rigidly attached to the camera.
+IMU.T_b_c1: !!opencv-matrix
+   rows: 4
+   cols: 4
+   dt: f
+   data: [ 1.0,  0.0,  0.0,  0.0,
+           0.0,  1.0,  0.0,  0.0,
+           0.0,  0.0,  1.0,  0.0,
+           0.0,  0.0,  0.0,  1.0]
+
+# IMU noise (official MARS-LVIG dataset parameters for DJI M300 RTK)
+IMU.NoiseGyro: 0.15          # rad/s/sqrt(Hz)
+IMU.NoiseAcc: 0.01           # m/s^2/sqrt(Hz)
+IMU.GyroWalk: 4.0e-03        # rad/s^2/sqrt(Hz)
+IMU.AccWalk: 0.001            # m/s^3/sqrt(Hz)
+IMU.Frequency: 400.0
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 3000
+
+# ORB Extractor: Scale factor between levels in the scale pyramid
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid
+ORBextractor.nLevels: 12
+
+# ORB Extractor: Fast threshold
+ORBextractor.iniThFAST: 10
+ORBextractor.minThFAST: 5
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -3.5
+Viewer.ViewpointF: 500.0
+

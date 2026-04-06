@@ -30,11 +30,14 @@ endif()
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../../cmake_modules)
 
-find_package(OpenCV 3.0 QUIET)
+find_package(OpenCV 4.0 QUIET)
 if(NOT OpenCV_FOUND)
-   find_package(OpenCV 2.4.3 QUIET)
+   find_package(OpenCV 3.0 QUIET)
    if(NOT OpenCV_FOUND)
-      message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
+      find_package(OpenCV 2.4.3 QUIET)
+      if(NOT OpenCV_FOUND)
+         message(FATAL_ERROR "OpenCV > 2.4.3 not found.")
+      endif()
    endif()
 endif()
 
@@ -46,6 +49,7 @@ ${PROJECT_SOURCE_DIR}
 ${PROJECT_SOURCE_DIR}/../../../
 ${PROJECT_SOURCE_DIR}/../../../include
 ${PROJECT_SOURCE_DIR}/../../../include/CameraModels
+${PROJECT_SOURCE_DIR}/../../../Thirdparty/Sophus
 ${Pangolin_INCLUDE_DIRS}
 )
 
@@ -112,5 +116,32 @@ src/ros_stereo_inertial.cc
 )
 
 target_link_libraries(Stereo_Inertial
+${LIBS}
+)
+
+# Node for monocular camera with compressed image support
+rosbuild_add_executable(Mono_Compressed
+src/ros_mono_compressed.cc
+)
+
+target_link_libraries(Mono_Compressed
+${LIBS}
+)
+
+# Node for monocular-inertial camera with compressed image support
+rosbuild_add_executable(Mono_Inertial_Compressed
+src/ros_mono_inertial_compressed.cc
+)
+
+target_link_libraries(Mono_Inertial_Compressed
+${LIBS}
+)
+
+# Node for monocular-inertial with virtual IMU (dynamic extrinsics)
+rosbuild_add_executable(Mono_Inertial_VirtualIMU
+src/ros_mono_inertial_virtual_imu.cc
+)
+
+target_link_libraries(Mono_Inertial_VirtualIMU
 ${LIBS}
 )
