@@ -1,93 +1,50 @@
-# Ignore all
-*
+# Large data files
+data/*.bag
 
-# Unignore all with extensions
-!*.*
-
-# Unignore all dirs
-!*/
-
-CMakeLists.txt.user
-CMakeLists_modified.txt
-
-Examples/RGB-D/rgbd_tum
-Examples/RGB-D/rgbd_realsense_D435i
-
-Examples/RGB-D-Inertial/rgbd_inertial_realsense_D435i
-
-Examples/Monocular/mono_realsense_D435i
-Examples/Monocular/mono_euroc
-Examples/Monocular/mono_kitti
-Examples/Monocular/mono_tum
-Examples/Monocular/mono_tum_vi
-Examples/Monocular/mono_realsense_t265
-
-Examples/Stereo/stereo_euroc
-Examples/Stereo/stereo_kitti
-Examples/Stereo/stereo_tum_vi
-Examples/Stereo/stereo_realsense_t265
-Examples/Stereo/stereo_realsense_D435i
-
-Examples/Monocular-Inertial/mono_inertial_euroc
-Examples/Monocular-Inertial/mono_inertial_tum_vi
-Examples/Monocular-Inertial/mono_inertial_realsense_t265
-Examples/Monocular-Inertial/mono_inertial_realsense_D435i
-Examples/Monocular-Inertial/mono_inertial_realsense_D435i_2
-
-Examples/Stereo-Inertial/stereo_inertial_euroc
-Examples/Stereo-Inertial/stereo_inertial_tum_vi
-Examples/Stereo-Inertial/stereo_inertial_realsense_t265
-Examples/Stereo-Inertial/stereo_inertial_realsense_D435i
-
-
-Examples/ROS/ORB_SLAM3/Mono
-Examples/ROS/ORB_SLAM3/Mono_Inertial
-Examples/ROS/ORB_SLAM3/MonoAR
-Examples/ROS/ORB_SLAM3/RGBD
-Examples/ROS/ORB_SLAM3/Stereo
-Examples/ROS/ORB_SLAM3/Stereo_Inertial
-
-Examples/Calibration/recorder_realsense_D435i
-
-Examples/Tests/viewer_dataset
-Examples/Tests/sophus_test
-
-Examples/ROS/ORB_SLAM3/CMakeLists.txt.user
-Examples/ROS/ORB_SLAM3/build/
-
-KeyFrameTrajectory.txt
-CameraTrajectory.txt
-kf_*.txt
-f_*.txt
+# Build directories
+build/
+cmake_build/
+lib/
 Thirdparty/DBoW2/build/
-Thirdparty/DBoW2/lib/
 Thirdparty/g2o/build/
 Thirdparty/g2o/config.h
-Thirdparty/g2o/lib/
+Thirdparty/Sophus/build/
+Examples_old/ROS/ORB_SLAM3/build/
+
+# Compiled executables
+Examples/Monocular/mono_*
+Examples/Stereo/stereo_*
+Examples/RGB-D/rgbd_*
+Examples/Monocular-Inertial/mono_inertial_*
+Examples/Stereo-Inertial/stereo_inertial_*
+Examples_old/Monocular/mono_*
+Examples_old/Stereo/stereo_*
+Examples_old/RGB-D/rgbd_*
+Examples_old/Monocular-Inertial/mono_inertial_*
+Examples_old/Stereo-Inertial/stereo_inertial_*
+Examples_old/ROS/ORB_SLAM3/Mono
+Examples_old/ROS/ORB_SLAM3/MonoAR
+Examples_old/ROS/ORB_SLAM3/Stereo
+Examples_old/ROS/ORB_SLAM3/RGBD
+Examples_old/ROS/ORB_SLAM3/Mono_Inertial
+Examples_old/ROS/ORB_SLAM3/Stereo_Inertial
+Examples_old/ROS/ORB_SLAM3/Mono_Compressed
+Examples_old/ROS/ORB_SLAM3/Mono_Inertial_Compressed
+Examples_old/ROS/ORB_SLAM3/Mono_Inertial_VirtualIMU
+
+# Large vocabulary (download separately)
 Vocabulary/ORBvoc.txt
-build/
 
-lib/
+# IDE / editor
+.cursor/
+.vscode/
+*.swp
+*.swo
 
-cmake_modules/
-cmake-build-debug/
-
-ExecMean.txt
-SessionInfo.txt
-Results_Euroc.txt
-LBA_Stats.txt
-LocalMapTimeStats.txt
-TrackLocalMapStats.txt
-TrackingTimeStats.txt
-time*
-Time*
-Table_Euroc
-Table_TUMVI_rooms/
+# Python
 *.pyc
-*.osa
-.idea/
-my_settings.txt
+__pycache__/
 
-borrar/*
-
-*/ExecMean.txt
+# OS
+.DS_Store
+Thumbs.db
