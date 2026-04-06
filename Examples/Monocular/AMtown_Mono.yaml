@@ -1,0 +1,67 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters for AMtown Dataset (DJI, 2448x2048)
+#--------------------------------------------------------------------------------------------
+File.version: "1.0"
+
+Camera.type: "PinHole"
+
+# Camera calibration and distortion parameters (OpenCV)
+# Original: fx=1453.72, fy=1453.28, cx=1172.18, cy=1041.78 @ 2448x2048
+# Downsampled 0.5x in ros_mono_compressed.cc, so intrinsics scaled accordingly
+Camera1.fx: 726.86
+Camera1.fy: 726.64
+Camera1.cx: 586.09
+Camera1.cy: 520.89
+
+Camera1.k1: -0.1210
+Camera1.k2: 0.1113
+Camera1.p1: 0.0016
+Camera1.p2: 0.00013
+Camera1.k3: -0.062353
+
+# Camera resolution (after 0.5x downsampling: 2448/2 x 2048/2)
+Camera.width: 1224
+Camera.height: 1024
+
+# Camera frames per second
+Camera.fps: 10
+
+# Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
+Camera.RGB: 1
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+# ORB Extractor: Number of features per image
+# Increased for 1224x1024 aerial imagery with distant features
+ORBextractor.nFeatures: 4000
+
+# ORB Extractor: Scale factor between levels in the scale pyramid
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid
+ORBextractor.nLevels: 12
+
+# ORB Extractor: Fast threshold
+# Lowered iniThFAST for more robust detection in low-texture aerial frames
+ORBextractor.iniThFAST: 8
+ORBextractor.minThFAST: 3
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500.0
+Viewer.imageViewScale: 1.0
+
