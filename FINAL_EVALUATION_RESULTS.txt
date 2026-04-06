@@ -1,0 +1,100 @@
+================================================================================
+ORB_SLAM3 TRAJECTORY EVALUATION - HKisland_GNSS03 Dataset
+================================================================================
+
+DATASET INFORMATION:
+- Duration: 390 seconds (6.5 minutes)
+- Ground Truth Poses: 1955 (RTK)
+- Estimated Poses: 546 (keyframes)
+- Aligned Poses: 249 (45.6% of estimated poses)
+- Alignment Success Rate: 45.6%
+
+NOTE: Only 249/546 poses could be aligned due to tracking loss (60.6% tracking 
+failure rate with 15 major tracking loss events)
+
+--------------------------------------------------------------------------------
+ABSOLUTE TRAJECTORY ERROR (ATE)
+--------------------------------------------------------------------------------
+Method: Sim(3) Umeyama alignment with scale correction
+Reference: Ground truth from RTK GPS
+
+  RMSE:        2.030041 m
+  Mean:        1.873935 m
+  Median:      1.608414 m
+  Std Dev:     0.780663 m
+  Min:         0.929503 m
+  Max:         4.722604 m
+
+--------------------------------------------------------------------------------
+RELATIVE POSE ERROR (RPE)
+--------------------------------------------------------------------------------
+Method: Consecutive frame pairs (delta = 1 frame)
+Alignment: Sim(3) Umeyama with scale correction
+
+  RMSE:        31.683956 m
+  Mean:        8.556477 m
+  Median:      2.817307 m
+  Std Dev:     30.506716 m
+  Min:         0.042746 m
+  Max:         455.378672 m
+
+NOTE: High RPE max value indicates large drift during tracking loss periods
+
+--------------------------------------------------------------------------------
+SCALE ESTIMATION
+--------------------------------------------------------------------------------
+Estimated Scale Factor: 1.0982
+Scale Error: 9.82%
+
+This is the scale correction factor applied to align the monocular SLAM 
+trajectory (arbitrary scale) to the ground truth (metric scale).
+
+--------------------------------------------------------------------------------
+ALIGNMENT PARAMETERS
+--------------------------------------------------------------------------------
+Rotation Matrix:
+[[ 0.09041145  0.9954663   0.02953991]
+ [ 0.99473783 -0.08883049 -0.05104697]
+ [-0.04819149  0.03399969 -0.99825929]]
+
+Translation Vector: [-0.434, 1.082, 0.777] meters
+
+--------------------------------------------------------------------------------
+PERFORMANCE ASSESSMENT
+--------------------------------------------------------------------------------
+
+ATE RMSE 2.03m:    GOOD
+- Below 3m threshold for outdoor navigation
+- Suitable for coarse localization and mapping
+
+RPE RMSE 31.68m:   POOR  
+- High drift accumulation
+- Caused by frequent tracking loss (60.6% failure rate)
+- 15 tracking loss events ranging from 2-59 seconds
+
+Scale Error 9.82%: GOOD
+- Within acceptable range for monocular SLAM
+- Better than typical 10-15% for challenging outdoor scenes
+
+Overall: MODERATE PERFORMANCE
+- Core tracking accuracy is good when maintained
+- Major issue is tracking robustness (only 45.6% pose alignment)
+- Recommend: increase ORB features, lower FAST threshold, or add IMU
+
+--------------------------------------------------------------------------------
+COMPARISON TO BASELINE
+--------------------------------------------------------------------------------
+Your Previous Baseline:
+- ATE: 2.5335 m
+- RPE: 1.7309 m  
+- Scale Error: 8.38%
+
+Current Results:
+- ATE: 2.0300 m  (✓ 19.9% better)
+- RPE: 31.6840 m (✗ 18x worse - due to tracking loss)
+- Scale Error: 9.82% (✗ 1.44% worse, still acceptable)
+
+The ATE improved but RPE is much worse due to tracking loss periods.
+Consider running on continuous tracking segments only for fair comparison.
+
+================================================================================
