@@ -27,6 +27,8 @@
 #include <opencv2/core/eigen.hpp>
 
 #include <iostream>
+#include <fstream>
+#include <chrono>
 
 using namespace std;
 
@@ -140,6 +142,10 @@ namespace ORB_SLAM3 {
             cout << "Loading settings from " << configFile << endl;
         }
 
+        try {
+        // #region agent log
+        { std::ofstream _dbg("/root/ORB_SLAM3/.cursor/debug-9672ba.log", std::ios_base::app); if (_dbg) _dbg << "{\"sessionId\":\"9672ba\",\"location\":\"Settings.cc:ctor\",\"message\":\"about to read Camera1\",\"data\":{\"configFile\":\"" << configFile << "\"},\"hypothesisId\":\"H1\",\"timestamp\":" << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() << "}\n"; }
+        // #endregion
         //Read first camera
         readCamera1(fSettings);
         cout << "\t-Loaded camera 1" << endl;
@@ -179,6 +185,12 @@ namespace ORB_SLAM3 {
         }
 
         cout << "----------------------------------" << endl;
+        } catch (const cv::Exception& e) {
+        // #region agent log
+        { std::ofstream _dbg("/root/ORB_SLAM3/.cursor/debug-9672ba.log", std::ios_base::app); if (_dbg) _dbg << "{\"sessionId\":\"9672ba\",\"location\":\"Settings.cc:ctor\",\"message\":\"cv::Exception during parse\",\"data\":{\"what\":\"" << e.what() << "\"},\"hypothesisId\":\"H1\",\"timestamp\":" << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() << "}\n"; }
+        // #endregion
+        throw;
+        }
     }
 
     void Settings::readCamera1(cv::FileStorage &fSettings) {

@@ -21,6 +21,8 @@
 #include <pangolin/pangolin.h>
 
 #include <mutex>
+#include <fstream>
+#include <chrono>
 
 namespace ORB_SLAM3
 {
@@ -164,7 +166,25 @@ void Viewer::Run()
     mbFinished = false;
     mbStopped = false;
 
+    // #region agent log
+    {
+        std::ofstream ofs("/root/ORB_SLAM3/.cursor/debug-7b775a.log", std::ios::app);
+        auto now = std::chrono::system_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+        ofs << "{\"sessionId\":\"7b775a\",\"runId\":\"pre-fix\",\"hypothesisId\":\"A\",\"location\":\"src/Viewer.cc:167\",\"message\":\"before CreateWindowAndBind\",\"data\":{},\"timestamp\":" << ms << "}\n";
+    }
+    // #endregion
+
     pangolin::CreateWindowAndBind("ORB-SLAM3: Map Viewer",1024,768);
+
+    // #region agent log
+    {
+        std::ofstream ofs("/root/ORB_SLAM3/.cursor/debug-7b775a.log", std::ios::app);
+        auto now = std::chrono::system_clock::now();
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+        ofs << "{\"sessionId\":\"7b775a\",\"runId\":\"pre-fix\",\"hypothesisId\":\"A\",\"location\":\"src/Viewer.cc:172\",\"message\":\"after CreateWindowAndBind\",\"data\":{},\"timestamp\":" << ms << "}\n";
+    }
+    // #endregion
 
     // 3D Mouse handler requires depth testing to be enabled
     glEnable(GL_DEPTH_TEST);
