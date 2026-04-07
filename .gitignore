@@ -1,5 +1,7 @@
 # Large data files
 data/*.bag
+data/TUM-VI/dataset-room1_512_16/
+data/TUM-VI/dataset-room1_512_16.tar
 
 # Build directories
 build/
