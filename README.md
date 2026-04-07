@@ -22,9 +22,17 @@ Evaluate and improve ORB-SLAM3 visual odometry on the **AMtown02** dataset from 
 | **Completeness** | 98.6% |
 | **Matched Poses** | 7398 / 7500 |
 
+### Research Findings — AMtown Mono-Inertial SLAM
+
+Mono-Inertial SLAM was found to be **infeasible** for the AMtown dataset due to the gimbal-stabilized camera:
+
+1. The camera-body extrinsic `T_b_c1` is **time-varying** (gimbal yaw changes >100° between survey legs)
+2. ORB-SLAM3 assumes a **fixed** `T_b_c1`, causing immediate tracking failure after IMU initialization
+3. A **Virtual IMU** approach was developed to overcome this, but the combination of high altitude + downward-looking camera makes visual-inertial scale estimation unreliable
+
 ### Mono-Inertial VIO — TUM-VI Validation
 
-To verify the VIO pipeline works correctly, we validated on the [TUM-VI](https://vision.in.tum.de/data/datasets/visual-inertial-dataset) benchmark dataset (`dataset-room1_512_16`):
+To confirm the above failure is dataset-specific rather than algorithmic, we validated on the [TUM-VI](https://vision.in.tum.de/data/datasets/visual-inertial-dataset) benchmark dataset (`dataset-room1_512_16`):
 
 | Metric | Value |
 |--------|-------|
@@ -33,14 +41,7 @@ To verify the VIO pipeline works correctly, we validated on the [TUM-VI](https:/
 | **Scale Factor** | 0.9986 (true scale recovered) |
 | **Tracking Rate** | 97.9% (2647/2704) |
 
-### Research Findings — AMtown Mono-Inertial SLAM
-
-Mono-Inertial SLAM was found to be **infeasible** for the AMtown dataset due to the gimbal-stabilized camera:
-
-1. The camera-body extrinsic `T_b_c1` is **time-varying** (gimbal yaw changes >100° between survey legs)
-2. ORB-SLAM3 assumes a **fixed** `T_b_c1`, causing immediate tracking failure after IMU initialization
-3. A **Virtual IMU** approach was developed to overcome this, but the combination of high altitude + downward-looking camera makes visual-inertial scale estimation unreliable
-4. VIO pipeline validated on TUM-VI benchmark — **cm-level accuracy** confirms the issue is dataset-specific, not algorithmic
+**cm-level accuracy** on TUM-VI confirms the VIO pipeline works correctly — the AMtown failure is caused by gimbal + high-altitude scene characteristics, not an implementation issue.
 
 ## Platform & Sensor Layout
 
