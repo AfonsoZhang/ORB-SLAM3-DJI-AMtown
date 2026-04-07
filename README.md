@@ -16,11 +16,11 @@ Evaluate and improve ORB-SLAM3 visual odometry on the **AMtown02** dataset from 
 
 | Metric | Value |
 |--------|-------|
-| **ATE RMSE** | **106.3 m** |
-| **RPE Trans Drift** | 2.01 m/m |
-| **RPE Rot Drift** | 70.8 deg/100m |
-| **Completeness** | 98.6% |
-| **Matched Poses** | 7398 / 7500 |
+| **ATE RMSE** | **90.2 m** |
+| **RPE Trans Drift** | 1.69 m/m |
+| **RPE Rot Drift** | 62.2 deg/100m |
+| **Completeness** | 98.7% |
+| **Matched Poses** | 7401 / 7500 |
 
 ### Research Findings — AMtown Mono-Inertial SLAM
 
@@ -83,7 +83,7 @@ fx: 726.86  fy: 726.64  cx: 586.09  cy: 520.89  (at 1224×1024)
 | nLevels | 8 | 12 | Larger scale variation at varying altitude |
 | iniThFAST | 20 | 8 | Lower threshold for low-contrast ground |
 
-ATE improved from **293m → 106m** with tuning.
+ATE improved from **293m → 90m** with tuning and optimized playback (0.5× rate).
 
 ### Step 4: Mono-Inertial SLAM Investigation
 
@@ -234,7 +234,7 @@ evo_ape tum data/TUM-VI/room1_groundtruth.txt data/TUM-VI/room1_estimated.txt --
 
 ## Conclusion
 
-Monocular VO with tuned ORB parameters achieves **ATE 106.3m** and **98.6% completeness** on the AMtown02 aerial mapping dataset.
+Monocular VO with tuned ORB parameters achieves **ATE 90.2m** and **98.7% completeness** on the AMtown02 aerial mapping dataset.
 
 The Mono-Inertial SLAM investigation yielded a **negative but informative result**: the DJI M300's gimbal-stabilized camera creates a time-varying camera-body extrinsic (`T_b_c1`) that fundamentally violates ORB-SLAM3's fixed-extrinsic assumption. Even with a novel Virtual IMU approach that correctly transforms body IMU data into the camera frame, visual-inertial tracking fails due to insufficient parallax from a high-altitude downward-looking camera.
 
