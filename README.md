@@ -134,34 +134,56 @@ This validates that ORB-SLAM3's Mono-Inertial pipeline works correctly and the A
 ![TUM-VI Trajectory Comparison](data/TUM-VI/figures/trajectory_comparison_trajectories.png)
 ![TUM-VI ATE Distribution](data/TUM-VI/figures/ate_map_raw.png)
 
-## File Structure
+## Code Contributions
+
+All files marked with ★ are **original work** created for this project. Other files are from the upstream [ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) repository.
+
+### ROS Nodes (C++)
+
+| File | Description |
+|------|-------------|
+| ★ `Examples_old/ROS/ORB_SLAM3/src/ros_mono_compressed.cc` | Mono SLAM with compressed image subscription + 0.5× downsampling |
+| ★ `Examples_old/ROS/ORB_SLAM3/src/ros_mono_inertial_compressed.cc` | Mono-Inertial SLAM with compressed images + DJI IMU |
+| ★ `Examples_old/ROS/ORB_SLAM3/src/ros_mono_inertial_virtual_imu.cc` | **Virtual IMU** — transforms body-fixed IMU to camera frame using gimbal angles, solving dynamic extrinsics problem |
+| ★ `Examples_old/ROS/ORB_SLAM3/CMakeLists.txt` | Modified to build above executables |
+
+### Configuration Files
+
+| File | Description |
+|------|-------------|
+| ★ `Examples/Monocular/AMtown_Mono.yaml` | AMtown Mono config with correct calibration (0.5× scaled) + tuned ORB parameters |
+| ★ `Examples/Monocular-Inertial/AMtown_MonoIMU.yaml` | AMtown Mono-Inertial config with IMU noise parameters + T_b_c1 |
+
+### Analysis Scripts (Python / Bash)
+
+| File | Description |
+|------|-------------|
+| ★ `data/extract_groundtruth.py` | Extract GT from rosbag GPS + attitude → TUM format |
+| ★ `data/analyze_gimbal.py` | Gimbal angle analysis — discovers time-varying T_b_c1 (root cause) |
+| ★ `test_rotations.sh` | Automated testing of 4 T_b_c1 rotation permutations |
+| ★ `test_extrinsic.sh` | Derived extrinsic testing from attitude + gimbal angles |
+
+### ORB-SLAM3 Source Modifications
+
+| File | Change |
+|------|--------|
+| `src/Tracking.cc` | Upstream file — studied thresholds for tracking failure analysis |
+
+### Data & Results
 
 ```
 ├── figures/
 │   ├── sensor_layout.png                   # DJI M300 sensor layout diagram
 │   └── trajectory_evaluation.png           # Trajectory comparison plot
-├── Examples/Monocular/
-│   └── AMtown_Mono.yaml                    # Mono config (tuned ORB + correct calibration)
-├── Examples/Monocular-Inertial/
-│   └── AMtown_MonoIMU.yaml                 # Mono-Inertial config (T_b_c1=identity for virtual IMU)
-├── Examples_old/ROS/ORB_SLAM3/src/
-│   ├── ros_mono_compressed.cc              # ROS node: Mono with compressed images + 0.5× downsample
-│   ├── ros_mono_inertial_compressed.cc     # ROS node: Mono-Inertial with fixed extrinsics
-│   └── ros_mono_inertial_virtual_imu.cc    # ROS node: Virtual IMU (dynamic extrinsics)
-├── data/
-│   ├── extract_groundtruth.py              # GPS+attitude → TUM ground truth
-│   └── analyze_gimbal.py                   # Gimbal angle analysis (root cause)
-├── test_rotations.sh                       # Automated T_b_c1 permutation testing
-├── test_extrinsic.sh                       # Derived extrinsic testing
-├── calib_yaml/                             # Raw camera calibrations for all datasets
 ├── data/TUM-VI/
 │   ├── room1_groundtruth.txt               # TUM-VI mocap GT (TUM format, 16541 poses)
 │   ├── room1_estimated.txt                 # VIO estimated trajectory (2704 poses)
 │   └── figures/                            # evo evaluation plots (ATE, RPE, trajectory)
+├── calib_yaml/                             # Raw camera calibrations for all datasets
 ├── AMtown02_groundtruth.txt                # Extracted ground truth (TUM format)
 ├── CameraTrajectory.txt                    # Best Mono VO result
 ├── evaluation_results_AMtown02/            # evo evaluation outputs
-└── AAE5303_assignment2_orbslam3_demo/      # Evaluation scripts
+└── AAE5303_assignment2_orbslam3_demo/      # Evaluation scripts (provided)
 ```
 
 ## How to Run
