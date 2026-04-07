@@ -43,6 +43,8 @@ To confirm the above failure is dataset-specific rather than algorithmic, we val
 
 **cm-level accuracy** on TUM-VI confirms the VIO pipeline works correctly — the AMtown failure is caused by gimbal + high-altitude scene characteristics, not an implementation issue.
 
+> **Limitation:** TUM-VI is an indoor handheld dataset, which differs significantly from the aerial survey scenario (scene structure, altitude, motion pattern). A more comparable validation would require an outdoor MAV dataset with rigid camera-IMU mounting (e.g., EuRoC MAV). Nevertheless, TUM-VI is sufficient to verify algorithmic correctness, as it is one of the standard benchmarks used in the original ORB-SLAM3 paper.
+
 ## Platform & Sensor Layout
 
 ![DJI M300 RTK Sensor Layout](figures/sensor_layout.png)
