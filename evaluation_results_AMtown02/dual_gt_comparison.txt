@@ -1,0 +1,143 @@
+=== Evaluation: SfM GT ===
+--------------------------------------------------------------------------------
+Loaded 6899 stamps and poses from: data/ground_truth_sfm.txt
+Loaded 7402 stamps and poses from: data/best_trajectory_sec.txt
+--------------------------------------------------------------------------------
+Synchronizing trajectories...
+Found 6899 of max. 6899 possible matching timestamps between...
+	data/ground_truth_sfm.txt
+and:	data/best_trajectory_sec.txt
+..with max. time diff.: 0.1 (s) and time offset: 0.0 (s).
+--------------------------------------------------------------------------------
+Aligning using Umeyama's method... (with scale correction)
+Rotation of alignment:
+[[ 0.61504815 -0.78561862 -0.06722466]
+ [-0.78842269 -0.61386703 -0.03945795]
+ [-0.0102681   0.07726999 -0.99695733]]
+Translation of alignment:
+[-434.0073729   -65.31896774  -71.85751388]
+Scale correction: 2.1571274492726116
+--------------------------------------------------------------------------------
+Compared 6899 absolute pose pairs.
+Calculating APE for translation part pose relation...
+--------------------------------------------------------------------------------
+APE w.r.t. translation part (m)
+(with Sim(3) Umeyama alignment)
+
+       max	13.008670
+      mean	5.397394
+    median	5.932790
+       min	0.234548
+      rmse	6.114018
+       sse	257893.049208
+       std	2.872170
+
+
+=== RPE (SfM GT, delta=10m) ===
+--------------------------------------------------------------------------------
+Loaded 6899 stamps and poses from: data/ground_truth_sfm.txt
+Loaded 7402 stamps and poses from: data/best_trajectory_sec.txt
+--------------------------------------------------------------------------------
+Synchronizing trajectories...
+Found 6899 of max. 6899 possible matching timestamps between...
+	data/ground_truth_sfm.txt
+and:	data/best_trajectory_sec.txt
+..with max. time diff.: 0.1 (s) and time offset: 0.0 (s).
+--------------------------------------------------------------------------------
+Aligning using Umeyama's method... (with scale correction)
+Rotation of alignment:
+[[ 0.61504815 -0.78561862 -0.06722466]
+ [-0.78842269 -0.61386703 -0.03945795]
+ [-0.0102681   0.07726999 -0.99695733]]
+Translation of alignment:
+[-434.0073729   -65.31896774  -71.85751388]
+Scale correction: 2.1571274492726116
+--------------------------------------------------------------------------------
+Found 468 pairs with delta 10.0 (m) among 6899 poses using consecutive pairs.
+Compared 468 relative pose pairs, delta = 10.0 (m) with consecutive pairs.
+Calculating RPE for translation part pose relation...
+--------------------------------------------------------------------------------
+RPE w.r.t. translation part (m)
+for delta = 10.0 (m) using consecutive pairs
+(with Sim(3) Umeyama alignment)
+
+       max	2.081524
+      mean	0.146521
+    median	0.119021
+       min	0.008283
+      rmse	0.200979
+       sse	18.903640
+       std	0.137564
+
+
+=== Evaluation: RTK GPS GT ===
+--------------------------------------------------------------------------------
+Loaded 7500 stamps and poses from: AMtown02_groundtruth.txt
+Loaded 7402 stamps and poses from: data/best_trajectory_sec.txt
+--------------------------------------------------------------------------------
+Synchronizing trajectories...
+Found 7402 of max. 7402 possible matching timestamps between...
+	AMtown02_groundtruth.txt
+and:	data/best_trajectory_sec.txt
+..with max. time diff.: 0.1 (s) and time offset: 0.0 (s).
+--------------------------------------------------------------------------------
+Aligning using Umeyama's method... (with scale correction)
+Rotation of alignment:
+[[ 0.61522413 -0.78563574 -0.06538934]
+ [-0.78827539 -0.61420259 -0.03710902]
+ [-0.01100813  0.07437517 -0.99716957]]
+Translation of alignment:
+[-4.47977237 -3.19641665  6.1536424 ]
+Scale correction: 2.1558716055561313
+--------------------------------------------------------------------------------
+Compared 7402 absolute pose pairs.
+Calculating APE for translation part pose relation...
+--------------------------------------------------------------------------------
+APE w.r.t. translation part (m)
+(with Sim(3) Umeyama alignment)
+
+       max	13.715834
+      mean	5.679653
+    median	5.565914
+       min	0.595615
+      rmse	6.342731
+       sse	297784.257388
+       std	2.823435
+
+
+=== RPE (RTK GT, delta=10m) ===
+--------------------------------------------------------------------------------
+Loaded 7500 stamps and poses from: AMtown02_groundtruth.txt
+Loaded 7402 stamps and poses from: data/best_trajectory_sec.txt
+--------------------------------------------------------------------------------
+Synchronizing trajectories...
+Found 7402 of max. 7402 possible matching timestamps between...
+	AMtown02_groundtruth.txt
+and:	data/best_trajectory_sec.txt
+..with max. time diff.: 0.1 (s) and time offset: 0.0 (s).
+--------------------------------------------------------------------------------
+Aligning using Umeyama's method... (with scale correction)
+Rotation of alignment:
+[[ 0.61522413 -0.78563574 -0.06538934]
+ [-0.78827539 -0.61420259 -0.03710902]
+ [-0.01100813  0.07437517 -0.99716957]]
+Translation of alignment:
+[-4.47977237 -3.19641665  6.1536424 ]
+Scale correction: 2.1558716055561313
+--------------------------------------------------------------------------------
+Found 474 pairs with delta 10.0 (m) among 7402 poses using consecutive pairs.
+Compared 474 relative pose pairs, delta = 10.0 (m) with consecutive pairs.
+Calculating RPE for translation part pose relation...
+--------------------------------------------------------------------------------
+RPE w.r.t. translation part (m)
+for delta = 10.0 (m) using consecutive pairs
+(with Sim(3) Umeyama alignment)
+
+       max	22.564717
+      mean	20.583002
+    median	20.757650
+       min	1.644055
+      rmse	20.641678
+       sse	201961.382650
+       std	1.555281
+
