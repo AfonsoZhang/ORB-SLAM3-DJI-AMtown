@@ -24,6 +24,7 @@
 | Metric | Value |
 |--------|-------|
 | **ATE RMSE** | **2.647 m** |
+| **RPE Trans Drift** | **2.065 m/m** |
 | **Completeness** | **98.7%** (7402/7500) |
 
 ## Method Summary
