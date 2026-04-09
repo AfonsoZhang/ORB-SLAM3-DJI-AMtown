@@ -2,6 +2,18 @@
 data/*.bag
 data/TUM-VI/dataset-room1_512_16/
 data/TUM-VI/dataset-room1_512_16.tar
+data/AMtown02_offline/
+data/AMtown02_offline_full/
+data/AMtown02_offline_undist2448/
+data/AMtown02_images/
+data/sampleinfos_interpolated.json
+
+# Intermediate experiment files
+f_*.txt
+kf_*.txt
+data/est_*_sec.txt
+data/estimated_*_sec.txt
+mono_euroc_full_run.log
 
 # Build directories
 build/
