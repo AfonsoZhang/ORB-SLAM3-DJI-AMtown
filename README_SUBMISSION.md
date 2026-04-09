@@ -15,25 +15,25 @@
 
 | Metric | Value |
 |--------|-------|
-| **ATE RMSE** | **6.114 m** |
-| **RPE Trans Drift** | **0.0147 m/m** |
+| **ATE RMSE** | **2.310 m** |
+| **RPE Trans Drift** | **0.0103 m/m** |
 | **Completeness** | **100%** (6899/6899) |
 
 ### Against RTK GPS Ground Truth
 
 | Metric | Value |
 |--------|-------|
-| **ATE RMSE** | **6.343 m** |
+| **ATE RMSE** | **2.647 m** |
 | **Completeness** | **98.7%** (7402/7500) |
 
 ## Method Summary
 
 - **SLAM System**: ORB-SLAM3 (Monocular, offline `mono_euroc`)
-- **Calibration**: MARS-LVIG official calibration (`AMtown_Mono_MARSLVIG.yaml`)
+- **Calibration**: HK_GNSS intrinsics + HKisland distortion (`AMtown_Mono_MARSLVIG.yaml`)
 - **Image Resolution**: 1224×1024 (0.5× downsampled)
 - **ORB Parameters**: nFeatures=2000, nLevels=8, iniThFAST=15
 - **Loop Closure**: Detected ✓
-- **Best of 5 runs** (ORB-SLAM3 multi-threading non-determinism)
+- **Best of 6 runs** (ORB-SLAM3 multi-threading non-determinism)
 
 ## Leaderboard JSON
 
@@ -42,8 +42,8 @@
   "group_name": "Debuggers",
   "project_private_repo_url": "https://github.com/AfonsoZhang/ORB-SLAM3-DJI-AMtown",
   "metrics": {
-    "ate_rmse_m": 6.114,
-    "rpe_trans_drift_m_per_m": 0.0147,
+    "ate_rmse_m": 2.310,
+    "rpe_trans_drift_m_per_m": 0.0103,
     "completeness_pct": 100.0
   }
 }

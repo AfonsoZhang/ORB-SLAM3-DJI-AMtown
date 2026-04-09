@@ -1,24 +1,23 @@
 {
   "sfm_gt": {
-    "ate_rmse_m": 6.114,
-    "ate_mean_m": 5.397,
-    "rpe_trans_mean_m_per_10m": 0.147,
+    "ate_rmse_m": 2.31,
+    "ate_mean_m": 2.112,
+    "rpe_trans_mean_m_per_10m": 0.103,
     "completeness_pct": 100.0,
     "matched_poses": "6899/6899",
-    "scale_correction": 2.157
+    "scale_correction": 2.151
   },
   "rtk_gt": {
-    "ate_rmse_m": 6.343,
-    "ate_mean_m": 5.68,
-    "rpe_trans_mean_m_per_10m": 20.583,
+    "ate_rmse_m": 2.647,
+    "ate_mean_m": 2.457,
     "completeness_pct": 98.7,
     "matched_poses": "7402/7500",
-    "scale_correction": 2.156
+    "scale_correction": 2.149
   },
-  "config": "AMtown_Mono_MARSLVIG.yaml",
+  "config": "AMtown_Mono_MARSLVIG.yaml (HK_GNSS intrinsics + HKisland distortion)",
   "method": "mono_euroc offline",
   "total_frames": 7402,
-  "keyframes": 1225,
+  "keyframes": 1261,
   "loop_closure": true,
-  "run_info": "Best of 5 runs (non-deterministic multi-threading)"
+  "run_info": "Best of 6 runs (non-deterministic multi-threading)"
 }

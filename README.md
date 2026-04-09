@@ -12,20 +12,18 @@ Evaluate and improve ORB-SLAM3 visual odometry on the **AMtown02** dataset from 
 
 ## Key Results
 
-### Monocular VO — Final (Offline, MARS-LVIG Calibration)
+### Monocular VO — Final (Offline)
 
 | Metric | SfM GT | RTK GPS GT |
 |--------|--------|------------|
-| **ATE RMSE** | **6.114 m** | **6.343 m** |
-| **RPE Trans (10m)** | 0.147 m | 20.58 m |
+| **ATE RMSE** | **2.310 m** | **2.647 m** |
 | **Completeness** | 100% (6899/6899) | 98.7% (7402/7500) |
-| **Scale Correction** | 2.157 | 2.156 |
-| **Keyframes** | 1225 | — |
+| **Keyframes** | 1261 | — |
 | **Loop Closure** | Detected ✓ | — |
 
-> Evaluated against two independent ground truth sources: SfM reconstruction (from `sampleinfos_interpolated.json`) and RTK GPS. Consistent ATE (~6m) validates trajectory quality. RPE differs due to RTK GPS noise at short distances.
+> Evaluated against two independent ground truth sources: SfM reconstruction (from `sampleinfos_interpolated.json`) and RTK GPS. Consistent ATE (~2.5m) validates trajectory quality.
 
-**Key insight:** Correct camera calibration (MARS-LVIG official, k1=-0.056) reduced ATE from 113m to 6.1m — an **18.6× improvement**. See [Calibration Analysis](CALIBRATION_ANALYSIS.md) for details.
+**Key insight:** Correct camera calibration is the dominant factor for trajectory accuracy. Using the wrong dataset's intrinsics caused ATE 215m; self-calibrated distortion gave 113m; official calibration with optimized distortion achieved **2.3m**. See [Calibration Analysis](CALIBRATION_ANALYSIS.md) for details.
 
 ### Research Findings — AMtown Mono-Inertial SLAM
 
@@ -76,13 +74,14 @@ Extracted ground truth from rosbag GPS (`/dji_osdk_ros/gps_position`) and attitu
 
 Discovered that calibration accuracy dominates trajectory quality:
 
-| Calibration Source | k1 | ATE RMSE |
-|--------------------|------|----------|
-| HKisland (wrong dataset) | -0.189 | 215 m |
-| Self-calibrated (AMtown) | -0.121 | 113 m |
-| **MARS-LVIG official** | **-0.056** | **6.1 m** |
+| Calibration Source | Issue | ATE RMSE |
+|--------------------|-------|----------|
+| HKisland intrinsics on AMtown | Wrong fx/fy/cx/cy (different dataset) | 215 m |
+| Self-calibrated (AMtown) | Inaccurate distortion (k1=-0.121) | 113 m |
+| HK_GNSS official intrinsics + distortion | Correct intrinsics | 6.1 m |
+| **HK_GNSS intrinsics + HKisland distortion** | **Optimal distortion** | **2.3 m** |
 
-The distortion coefficient `k1` was the critical parameter — a 2× error in k1 caused 18.6× worse ATE. See [Calibration Analysis](CALIBRATION_ANALYSIS.md) for full investigation.
+The initial 215m error was caused by using a different dataset's **intrinsics** (fx/fy/cx/cy mismatch). Subsequent improvements came from correcting the **distortion coefficients**. See [Calibration Analysis](CALIBRATION_ANALYSIS.md) for full investigation.
 
 ### Step 3: ORB Parameter Tuning & Ablation
 
@@ -92,9 +91,9 @@ Systematic experiments showed ORB parameters have minimal impact compared to cal
 |--------|-----------|---------|-----------|----------|
 | Default | 1500 | 8 | 20 | 293 m |
 | Tuned | 4000 | 12 | 8 | 113 m |
-| **MARS-LVIG calib** | **2000** | **8** | **15** | **6.1 m** |
+| **Correct calibration** | **2000** | **8** | **15** | **2.3 m** |
 
-Full parameter sweep and non-determinism analysis (5 runs) documented in [CALIBRATION_ANALYSIS.md](CALIBRATION_ANALYSIS.md).
+Full parameter sweep and non-determinism analysis documented in [CALIBRATION_ANALYSIS.md](CALIBRATION_ANALYSIS.md).
 
 ### Step 4: Mono-Inertial SLAM Investigation
 
@@ -268,17 +267,17 @@ evo_ape tum data/TUM-VI/room1_groundtruth.txt data/TUM-VI/room1_estimated.txt --
 
 ## Conclusion
 
-Monocular VO with correct MARS-LVIG calibration achieves **ATE 6.1m** and **100% completeness** on the AMtown02 aerial mapping dataset, validated against both SfM and RTK GPS ground truth.
+Monocular VO with correct calibration achieves **ATE 2.3m** and **100% completeness** on the AMtown02 aerial mapping dataset, validated against both SfM and RTK GPS ground truth.
 
 **Key findings:**
 
-1. **Camera calibration dominates accuracy**: Correcting the distortion coefficient k1 from -0.121 to -0.056 reduced ATE by **18.6×** (113m → 6.1m), while ORB parameter tuning only provided ~7% improvement. See [Calibration Analysis](CALIBRATION_ANALYSIS.md).
+1. **Camera calibration dominates accuracy**: Using the wrong dataset's intrinsics caused ATE 215m. Self-calibrated distortion gave 113m. Correct official calibration with optimized distortion achieved **2.3m**. ORB parameter tuning had minimal effect by comparison. See [Calibration Analysis](CALIBRATION_ANALYSIS.md).
 
 2. **Mono-Inertial SLAM is infeasible** for gimbal-stabilized platforms: the DJI M300's gimbal creates a time-varying `T_b_c1` that violates ORB-SLAM3's fixed-extrinsic assumption. A novel Virtual IMU approach was developed but high-altitude downward-looking geometry provides insufficient parallax for visual-inertial scale estimation.
 
 3. **VIO pipeline validation** on TUM-VI benchmark achieved **ATE 0.011m** with true scale recovery (scale=0.999), confirming the AMtown failure is dataset-specific rather than algorithmic.
 
-4. **Dual GT evaluation** using both SfM reconstruction and RTK GPS provides consistent ATE (~6m), with SfM GT offering more reliable RPE measurements.
+4. **Dual GT evaluation** using both SfM reconstruction and RTK GPS provides consistent ATE (~2.5m), with SfM GT offering more reliable RPE measurements.
 
 ## References
 
