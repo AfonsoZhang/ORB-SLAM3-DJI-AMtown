@@ -1,9 +1,9 @@
 %YAML:1.0
 
 #--------------------------------------------------------------------------------------------
-# Camera Parameters — MARS-LVIG official calibration (0.5x scaled to 1224x1024)
-# Source: MARS-LVIG dataset distribution calibration files
-# Key difference from AMtown_Mono.yaml: k1=-0.056 vs -0.121 (reduces ATE from 113m to 6m)
+# Camera Parameters — Best config for AMtown02 (ATE 2.3m)
+# Intrinsics from HK_GNSS(airport & island).yaml (0.5x scaled to 1224x1024)
+# Distortion from HKisland calibration (slightly better than HK_GNSS distortion)
 #--------------------------------------------------------------------------------------------
 File.version: "1.0"
 
@@ -13,11 +13,11 @@ Camera1.fx: 722.215
 Camera1.fy: 722.17
 Camera1.cx: 589.75
 Camera1.cy: 522.45
-Camera1.k1: -0.0560
-Camera1.k2: 0.1180
-Camera1.p1: 0.00122
-Camera1.p2: 0.00064
-Camera1.k3: -0.0627
+Camera1.k1: -0.0530
+Camera1.k2: 0.1210
+Camera1.p1: 0.00127
+Camera1.p2: 0.00043
+Camera1.k3: -0.06495
 Camera.width: 1224
 Camera.height: 1024
 Camera.fps: 10
