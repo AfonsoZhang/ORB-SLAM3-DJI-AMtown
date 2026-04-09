@@ -39,7 +39,7 @@
 
 ```json
 {
-  "group_name": "ZHANG Shuyang",
+  "group_name": "Debuggers",
   "project_private_repo_url": "https://github.com/AfonsoZhang/ORB-SLAM3-DJI-AMtown",
   "metrics": {
     "ate_rmse_m": 6.114,
