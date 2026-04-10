@@ -83,10 +83,32 @@ ORB-SLAM3 has inherent non-determinism from multi-threading.
 
 Best result is **2.310m** (Run 0). Runs are stable at ~2.3-2.5m with occasional outliers.
 
+## k1 Ablation Study
+
+To isolate the effect of the first-order radial distortion coefficient k1, we ran an ablation experiment: **only k1 was varied**, while all other parameters (intrinsics, k2, p1, p2, k3, ORB settings) were held constant at the best configuration.
+
+| k1 | ATE RMSE (m) | Relative to Best |
+|--------|-------------|------------------|
+| -0.121 | 110.7 | 46.3× worse |
+| -0.070 | — (crash) | tracking failure |
+| -0.056 | 5.25 | 2.2× worse |
+| **-0.053** | **2.39** | **baseline** |
+| -0.045 | 6.45 | 2.7× worse |
+| -0.035 | 22.1 | 9.3× worse |
+
+### Observations
+
+1. **Varying k1 alone causes ATE to change by 46×** (2.39m → 110.7m), demonstrating that the distortion model has a decisive impact on monocular VO accuracy.
+2. There is a **sharp optimum around k1 ≈ -0.053**: deviating by just 0.003 (to -0.056) doubles ATE from 2.4m to 5.3m.
+3. Both over-correction (k1 too negative) and under-correction (k1 too close to zero) cause severe degradation, forming a **U-shaped error curve**.
+4. At k1 = -0.070, ORB-SLAM3 fails entirely — the distortion model is so wrong that feature tracking collapses.
+
+This confirms that k1 is a critical parameter: incorrect radial distortion causes feature positions after undistortion to deviate from their true locations, which propagates through matching → triangulation → bundle adjustment → loop closure, accumulating into large trajectory drift.
+
 ## Conclusion
 
 For aerial VO with ORB-SLAM3:
 1. **Correct intrinsics (fx/fy/cx/cy)** are essential — wrong intrinsics cause complete failure
-2. **Accurate distortion coefficients** are the next most important factor — reducing ATE from 113m to 2.3m
+2. **Accurate distortion coefficients** are the next most important factor — the k1 ablation study shows that varying k1 alone changes ATE by 46×
 3. **ORB parameter tuning** has minimal impact compared to calibration accuracy
 4. **Multiple runs** are recommended due to non-determinism (~0.2m variance)
