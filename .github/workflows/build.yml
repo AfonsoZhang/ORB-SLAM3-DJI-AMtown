@@ -1,0 +1,63 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Compile core library + ROS nodes
+    runs-on: ubuntu-latest
+    container: ros:noetic-perception-focal
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential cmake git wget unzip \
+            libeigen3-dev libboost-serialization-dev libssl-dev \
+            libgl1-mesa-dev libglew-dev \
+            ros-noetic-tf ros-noetic-rosbuild ros-noetic-rosbash ros-noetic-mk
+
+      - name: Cache Pangolin
+        id: cache-pangolin
+        uses: actions/cache@v4
+        with:
+          path: /tmp/Pangolin
+          key: pangolin-v0.6-focal
+
+      - name: Build Pangolin v0.6
+        if: steps.cache-pangolin.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 --branch v0.6 https://github.com/stevenlovegrove/Pangolin.git /tmp/Pangolin
+          cmake -S /tmp/Pangolin -B /tmp/Pangolin/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build /tmp/Pangolin/build -j"$(nproc)"
+
+      - name: Install Pangolin
+        run: |
+          cmake --build /tmp/Pangolin/build --target install
+          ldconfig
+
+      - name: Build core library and examples
+        run: ./build.sh
+
+      - name: Build ROS nodes
+        shell: bash
+        run: |
+          source /opt/ros/noetic/setup.bash
+          export ROS_PACKAGE_PATH="$PWD/Examples/ROS:$ROS_PACKAGE_PATH"
+          ./build_ros.sh
+
+  shellcheck:
+    name: Lint shell scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run shellcheck
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          shellcheck scripts/*.sh build.sh build_ros.sh

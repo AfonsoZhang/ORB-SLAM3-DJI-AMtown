@@ -1,5 +1,6 @@
 # ORB-SLAM3 on DJI Aerial Imagery — AMtown02
 
+[![build](https://github.com/AfonsoZhang/ORB-SLAM3-DJI-AMtown/actions/workflows/build.yml/badge.svg)](https://github.com/AfonsoZhang/ORB-SLAM3-DJI-AMtown/actions/workflows/build.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![ROS](https://img.shields.io/badge/ROS-Noetic-22314E?logo=ros)](http://wiki.ros.org/noetic)
 [![C++14](https://img.shields.io/badge/C%2B%2B-14-00599C?logo=cplusplus)](https://isocpp.org/)
