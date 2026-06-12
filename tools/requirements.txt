@@ -1,0 +1,5 @@
+numpy
+opencv-python
+matplotlib
+evo
+# rosbag comes from the ROS installation (ros-noetic-rosbag), not pip
