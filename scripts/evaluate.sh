@@ -27,4 +27,4 @@ evo_ape tum data/AMtown02_groundtruth.txt "$TRAJ_S" \
     --align --correct_scale --t_max_diff 0.1 -a
 
 echo
-echo "Expected: ATE RMSE 2.3-2.9 m vs SfM GT (see docs/REPRODUCIBILITY.md)"
+echo "Expected: ATE RMSE 2.2-2.9 m vs SfM GT (see docs/REPRODUCIBILITY.md)"

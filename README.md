@@ -96,7 +96,7 @@ scripts/run_amtown.sh         # extract images + run monocular VO
 scripts/evaluate.sh           # evo ATE against both ground truths
 ```
 
-Expected result: ATE RMSE in the **2.3–2.9 m** range — see [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for the non-determinism analysis.
+Expected result: ATE RMSE in the **2.2–2.9 m** range — see [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for the non-determinism analysis.
 
 <details>
 <summary><b>Online ROS mode</b></summary>

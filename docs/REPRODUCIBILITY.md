@@ -7,8 +7,8 @@ Running the offline pipeline (`scripts/run_amtown.sh` + `scripts/evaluate.sh`) w
 
 | Metric (vs SfM GT) | Expected |
 |--------------------|----------|
-| ATE RMSE | **2.3 – 2.9 m** (single run) |
-| Best observed | 2.308 m |
+| ATE RMSE | **2.2 – 2.9 m** (single run) |
+| Best observed | 2.243 m (fresh Docker end-to-end run) |
 | Completeness | ~7400 / 7499 frames |
 | Maps in atlas | 1 (no resets), loop closures detected |
 
@@ -28,8 +28,8 @@ A 5-run study on an earlier configuration of this project (ATE ≈ 6 m era,
 - Runs 1–4: 6.11 – 6.26 m → consistent, ≈ ±1.6% relative variance
 - Run 5: 8.05 m → occasional outlier (~+30%) when loop closure triggers suboptimally
 
-With the final calibration, observed single-run ATEs were 2.31 – 2.60 m across
-8 runs (6 original + 2 regression runs during repo restructuring).
+With the final calibration, observed single-run ATEs were 2.24 – 2.60 m across
+9 runs (6 original + 3 verification runs during repo restructuring).
 
 **Recommendation:** run 3–5 times and report the distribution (or the best, stating so).
 
