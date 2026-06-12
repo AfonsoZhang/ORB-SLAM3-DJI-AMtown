@@ -1,0 +1,14 @@
+# Keep the build context small: exclude datasets, build trees, git history
+.git
+data/*.bag
+data/AMtown02_offline*
+data/AMtown02_images
+data/TUM-VI/dataset-room1_512_16
+data/TUM-VI/dataset-room1_512_16.tar
+data/sampleinfos_interpolated.json
+build
+Thirdparty/*/build
+Examples/ROS/ORB_SLAM3/build
+lib
+f_*.txt
+kf_*.txt
