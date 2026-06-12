@@ -1,18 +1,16 @@
-# ORB-SLAM3 on DJI Drone Aerial Imagery (AMtown02)
+# ORB-SLAM3 on DJI Aerial Imagery — AMtown02
 
-**Course:** AAE5303 — Robust Control Technology in Low-Altitude Aerial Vehicle  
-**Student:** ZHANG Shuyang  
-**Institution:** The Hong Kong Polytechnic University
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![ROS](https://img.shields.io/badge/ROS-Noetic-22314E?logo=ros)](http://wiki.ros.org/noetic)
+[![C++14](https://img.shields.io/badge/C%2B%2B-14-00599C?logo=cplusplus)](https://isocpp.org/)
+[![Dataset](https://img.shields.io/badge/Dataset-MARS--LVIG-orange)](https://mars.hku.hk/dataset.html)
 
----
+**Monocular visual odometry on a DJI M300 RTK aerial survey — 2.3 m ATE over a 750-second, 6,899-frame flight — plus a systematic analysis of why visual-inertial SLAM fundamentally fails on gimbal-stabilized platforms.**
 
-## Research Objective
+![Estimated trajectory vs. ground truth](figures/presentation/trajectory_sfm_trajectories.png)
+*Estimated trajectory (solid) vs. SfM ground truth (dashed) on the AMtown02 lawnmower survey pattern — ATE RMSE 2.31 m over a roughly 900 × 600 m survey area.*
 
-Evaluate and improve ORB-SLAM3 visual odometry on the **AMtown02** dataset from [MARS-LVIG](https://mars.hku.hk/dataset.html), a challenging aerial mapping sequence captured by a DJI M300 RTK drone with a gimbal-stabilized downward-looking camera. This project explores both **Monocular VO** and **Monocular-Inertial SLAM**, investigating the fundamental challenges of fusing body-fixed IMU data with a gimbal-mounted camera.
-
-## Key Results
-
-### Monocular VO — Final (Offline)
+## Results at a Glance
 
 | Metric | SfM GT | RTK GPS GT |
 |--------|--------|------------|
@@ -22,58 +20,17 @@ Evaluate and improve ORB-SLAM3 visual odometry on the **AMtown02** dataset from 
 | **Keyframes** | 1261 | — |
 | **Loop Closure** | Detected ✓ | — |
 
-> Evaluated against two independent ground truth sources: SfM reconstruction (from `sampleinfos_interpolated.json`) and RTK GPS. Consistent ATE (~2.5m) validates trajectory quality. Reported values are the best of 6 runs (ORB-SLAM3 multi-threading is non-deterministic; single runs typically fall in 2.3–2.9 m).
+> Evaluated against two independent ground truth sources. Reported values are the best of 6 runs — ORB-SLAM3's multi-threading is non-deterministic and single runs typically land between 2.3 and 2.9 m.
 
-**Key insight:** Correct camera calibration is the dominant factor for trajectory accuracy. Using the wrong dataset's intrinsics caused ATE 215m; self-calibrated distortion gave 113m; official calibration with optimized distortion achieved **2.3m**. See [Calibration Analysis](docs/CALIBRATION_ANALYSIS.md) for details.
+This is a fork of [ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) adapted for the **AMtown02** sequence of [MARS-LVIG](https://mars.hku.hk/dataset.html): a DJI M300 RTK drone flying a mapping survey with a gimbal-stabilized, downward-looking 2448×2048 camera at 10 Hz. Original contributions are listed in [Code Contributions](#code-contributions).
 
-### Research Findings — AMtown Mono-Inertial SLAM
+---
 
-Mono-Inertial SLAM was found to be **infeasible** for the AMtown dataset due to the gimbal-stabilized camera:
+## Finding 1 — Calibration Dominates Accuracy (215 m → 2.3 m)
 
-1. The camera-body extrinsic `T_b_c1` is **time-varying** (gimbal yaw changes >100° between survey legs)
-2. ORB-SLAM3 assumes a **fixed** `T_b_c1`, causing immediate tracking failure after IMU initialization
-3. A **Virtual IMU** approach was developed to overcome this, but the combination of high altitude + downward-looking camera makes visual-inertial scale estimation unreliable
+The single biggest lever on trajectory accuracy was not ORB parameters, not resolution, not the SLAM configuration — it was camera calibration:
 
-### Mono-Inertial VIO — TUM-VI Validation
-
-To confirm the above failure is dataset-specific rather than algorithmic, we validated on the [TUM-VI](https://vision.in.tum.de/data/datasets/visual-inertial-dataset) benchmark dataset (`dataset-room1_512_16`):
-
-| Metric | Value |
-|--------|-------|
-| **ATE RMSE** | **0.011 m** (1.1 cm) |
-| **RPE RMSE** | 0.0097 m/frame |
-| **Scale Factor** | 0.9986 (true scale recovered) |
-| **Tracking Rate** | 97.9% (2647/2704) |
-
-**cm-level accuracy** on TUM-VI confirms the VIO pipeline works correctly — the AMtown failure is caused by gimbal + high-altitude scene characteristics, not an implementation issue.
-
-> **Limitation:** TUM-VI is an indoor handheld dataset, which differs significantly from the aerial survey scenario (scene structure, altitude, motion pattern). A more comparable validation would require an outdoor MAV dataset with rigid camera-IMU mounting (e.g., EuRoC MAV). Nevertheless, TUM-VI is sufficient to verify algorithmic correctness, as it is one of the standard benchmarks used in the original ORB-SLAM3 paper.
-
-## Platform & Sensor Layout
-
-![DJI M300 RTK Sensor Layout](figures/sensor_layout.png)
-
-The UAV IMU is body-fixed on the airframe, while the camera is mounted on a 3-axis gimbal below. During flight, the gimbal maintains the camera pointing downward regardless of body rotation, creating a **time-varying** transform between IMU and camera frames.
-
-| Property | Value |
-|----------|-------|
-| **Dataset** | AMtown02 (MARS-LVIG) |
-| **Platform** | DJI M300 RTK |
-| **Camera** | 2448×2048, 10 Hz, gimbal-stabilized |
-| **IMU** | DJI onboard IMU, 400 Hz (body-fixed) |
-| **Gimbal** | 3-axis stabilized, camera pointing downward |
-| **Duration** | ~750 seconds |
-| **Ground Truth** | RTK GPS + SfM (dual evaluation) |
-
-## Methodology
-
-### Step 1: Ground Truth Extraction
-
-Extracted ground truth from rosbag GPS (`/dji_osdk_ros/gps_position`) and attitude (`/dji_osdk_ros/attitude`) topics, converting GPS coordinates to local ENU frame in TUM format.
-
-### Step 2: Camera Calibration Investigation
-
-Discovered that calibration accuracy dominates trajectory quality:
+![Calibration impact](figures/presentation/calibration_sensitivity.png)
 
 | Calibration Source | Issue | ATE RMSE |
 |--------------------|-------|----------|
@@ -82,133 +39,52 @@ Discovered that calibration accuracy dominates trajectory quality:
 | HK_GNSS official intrinsics + distortion | Correct intrinsics | 6.1 m |
 | **HK_GNSS intrinsics + HKisland distortion** | **Optimal distortion** | **2.3 m** |
 
-The initial 215m error was caused by using a different dataset's **intrinsics** (fx/fy/cx/cy mismatch). Subsequent improvements came from correcting the **distortion coefficients**. See [Calibration Analysis](docs/CALIBRATION_ANALYSIS.md) for full investigation.
+An ablation isolating the first-order radial distortion coefficient shows **k1 alone changes ATE by 46×** (110.7 m at k1=-0.121 vs. 2.4 m at the optimum −0.053), with a tracking-failure cliff in between:
 
-### Step 3: ORB Parameter Tuning & Ablation
+![k1 ablation](figures/presentation/k1_ablation.png)
 
-Systematic experiments showed ORB parameters have minimal impact compared to calibration:
+By comparison, an aggressive ORB parameter sweep (nFeatures 1500→4000, nLevels 8→12, iniThFAST 20→8) moved ATE by less than 3× — and running at full 2448×2048 resolution was *no better* than 0.5× downsampling. Full investigation in [docs/CALIBRATION_ANALYSIS.md](docs/CALIBRATION_ANALYSIS.md).
 
-| Config | nFeatures | nLevels | iniThFAST | ATE RMSE |
-|--------|-----------|---------|-----------|----------|
-| Default | 1500 | 8 | 20 | 293 m |
-| Tuned | 4000 | 12 | 8 | 113 m |
-| **Correct calibration** | **2000** | **8** | **15** | **2.3 m** |
+## Finding 2 — Why VIO Cannot Work on a Gimbal (a Negative Result)
 
-Full parameter sweep and non-determinism analysis documented in [CALIBRATION_ANALYSIS.md](docs/CALIBRATION_ANALYSIS.md).
+Mono-inertial ORB-SLAM3 fails on this platform — **by design, not by bug**:
 
-### Step 4: Mono-Inertial SLAM Investigation
+![DJI M300 RTK Sensor Layout](figures/sensor_layout.png)
 
-Created `ros_mono_inertial_compressed.cc` for IMU_MONOCULAR mode. Systematically tested:
+1. The drone's IMU is **body-fixed**; the camera hangs on a **3-axis gimbal** that keeps it pointing down regardless of body motion. Gimbal analysis (`tools/analyze_gimbal.py`) shows the camera-body extrinsic `T_b_c1` swings **>100° in yaw** between survey legs, with ~7.5° variation even within a "steady" leg.
+2. ORB-SLAM3 — like virtually all VIO systems — assumes a **fixed** `T_b_c1`. Every configuration tested (4 rotation permutations, derived per-timestamp extrinsics) fails immediately after IMU initialization: *"Fail to track local map!"*
+3. **Virtual IMU**: a custom ROS node ([`ros_mono_inertial_virtual_imu.cc`](Examples/ROS/ORB_SLAM3/src/ros_mono_inertial_virtual_imu.cc)) synthesizes an IMU rigidly attached to the camera by fusing body IMU + drone attitude + gimbal angles at 400 Hz: `R_cb(t) = (R_wb^T · R_wg · R_gim_cam)^T`, with accelerometer rotation verified (|a| ≈ 9.81) and angular velocity computed at gimbal rate (50 Hz) to limit differentiation noise. Even with correct virtual IMU data, tracking fails — at survey altitude looking straight down, parallax is too weak for visual-inertial scale estimation.
 
-- **4 rotation permutations** for body-camera extrinsic `T_b_c1` (`scripts/experiments/test_rotations.sh`)
-- **Derived extrinsics** from drone attitude + gimbal angles at specific timestamps (`scripts/experiments/test_extrinsic.sh`)
-- **Topic remapping** corrections for DJI rosbag
+**Validation that the pipeline itself is sound:** the same VIO setup on the TUM-VI `room1` benchmark achieves **ATE 0.011 m** (1.1 cm) with true metric scale recovered (×0.9986) and 97.9% tracking — confirming the AMtown failure is a platform property, not an implementation error.
 
-All attempts resulted in "Fail to track local map!" after Visual-Inertial BA.
+| TUM-VI room1 (VIO validation) | Value |
+|-------------------------------|-------|
+| ATE RMSE | **0.011 m** |
+| Scale factor | 0.9986 (true scale) |
+| Tracking rate | 97.9% (2647/2704) |
 
-### Step 5: Root Cause Analysis — Gimbal Problem
+> **Takeaway:** gimbal-stabilized aerial platforms need VIO pipelines that model time-varying camera-body extrinsics — standard ORB-SLAM3 cannot be configured around this.
 
-Ran `tools/analyze_gimbal.py` on the rosbag gimbal data and discovered (see [sensor layout](#platform--sensor-layout)):
-- Gimbal yaw changes **>100°** between survey legs
-- Even within a "constant" segment, body attitude changes cause **~7.5°** variation in `T_b_c1`
-- This exceeds ORB-SLAM3's tolerance for extrinsic calibration error
+---
 
-The UAV IMU is body-fixed while the camera is gimbal-mounted — as the drone turns between survey legs, the gimbal compensates by rotating the camera, creating a continuously changing `T_b_c1`.
+## Quick Start
 
-### Step 6: Virtual IMU Approach
+Prerequisites: the standard [ORB-SLAM3 dependencies](Dependencies.md) (Pangolin, OpenCV ≥ 4.4, Eigen3) plus ROS Noetic for the online nodes, and [`evo`](https://github.com/MichaelGrupp/evo) for evaluation. The `liangyu99/orbslam3_ros1` Docker image provides a working environment.
 
-Developed `ros_mono_inertial_virtual_imu.cc` that creates a virtual IMU rigidly attached to the camera by:
-1. Subscribing to body IMU, drone attitude, and gimbal angles simultaneously
-2. Computing `R_cb(t) = (R_wb^T · R_wg · R_gim_cam)^T` at each IMU timestamp
-3. Rotating accelerometer: `a_cam = R_cb · a_body` (correct, verified |a|≈9.81)
-4. Computing camera angular velocity at gimbal rate (50 Hz) to avoid noise amplification
-
-**Technical challenges solved:**
-- Eigen alignment crash (SIMD alignment of `Quaterniond` in `std::deque`)
-- Numerical differentiation noise (400 Hz → 50 Hz rate reduction)
-
-**Conclusion:** Even with correct virtual IMU data, Mono-Inertial tracking fails because high-altitude downward-looking camera provides poor parallax for visual-inertial scale estimation.
-
-### Step 7: VIO Pipeline Validation on TUM-VI
-
-To confirm the VIO failure was dataset-specific (not an implementation bug), ran ORB-SLAM3's `mono_inertial_tum_vi` on the [TUM-VI dataset](https://vision.in.tum.de/data/datasets/visual-inertial-dataset) `room1` sequence:
-
-- **ATE RMSE: 0.011 m** (cm-level accuracy)
-- **Scale factor: 0.9986** (VIO correctly recovers metric scale without `--correct_scale`)
-- **Tracking rate: 97.9%** (2647/2704 frames)
-- RPE median: 1.6 mm per frame
-
-This validates that ORB-SLAM3's Mono-Inertial pipeline works correctly and the AMtown failures are due to:
-1. Gimbal-induced time-varying extrinsics
-2. Poor parallax from high-altitude downward-looking camera
-
-![TUM-VI Trajectory Comparison](data/TUM-VI/figures/trajectory_comparison_trajectories.png)
-![TUM-VI ATE Distribution](data/TUM-VI/figures/ate_map_raw.png)
-
-## Code Contributions
-
-All files marked with ★ are **original work** created for this project. Other files are from the upstream [ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) repository.
-
-### ROS Nodes (C++)
-
-| File | Description |
-|------|-------------|
-| ★ `Examples/ROS/ORB_SLAM3/src/ros_mono_compressed.cc` | Mono SLAM with compressed image subscription + 0.5× downsampling |
-| ★ `Examples/ROS/ORB_SLAM3/src/ros_mono_inertial_compressed.cc` | Mono-Inertial SLAM with compressed images + DJI IMU |
-| ★ `Examples/ROS/ORB_SLAM3/src/ros_mono_inertial_virtual_imu.cc` | **Virtual IMU** — transforms body-fixed IMU to camera frame using gimbal angles, solving dynamic extrinsics problem |
-| ★ `Examples/ROS/ORB_SLAM3/CMakeLists.txt` | Modified to build above executables |
-
-### Configuration Files
-
-| File | Description |
-|------|-------------|
-| ★ `Examples/Monocular/AMtown_Mono_MARSLVIG.yaml` | **Best config** — official calibration + optimized distortion (ATE 2.31m) |
-| ★ `Examples/Monocular/AMtown_Mono.yaml` | Self-calibrated config (for comparison, ATE 113m) |
-| ★ `Examples/Monocular/ablation_k1_*.yaml` | k1 distortion ablation series (ATE varies 46×) |
-| ★ `Examples/Monocular-Inertial/AMtown_MonoIMU.yaml` | AMtown Mono-Inertial config with IMU noise parameters + T_b_c1 |
-
-### Analysis Scripts (Python / Bash)
-
-| File | Description |
-|------|-------------|
-| ★ `tools/extract_groundtruth.py` | Extract GT from rosbag GPS + attitude → TUM format |
-| ★ `tools/extract_images.py` | Extract 0.5× downsampled image sequence from rosbag |
-| ★ `tools/extract_fullres.py` | Extract full-resolution (2448×2048) image sequence |
-| ★ `tools/sampleinfos_to_tum.py` | Convert SfM GT (sampleinfos JSON) → TUM format |
-| ★ `tools/analyze_gimbal.py` | Gimbal angle analysis — discovers time-varying T_b_c1 (root cause) |
-| ★ `tools/evaluate_vo_accuracy.py` | ATE/RPE evaluation pipeline (JSON report) |
-| ★ `scripts/experiments/test_rotations.sh` | Automated testing of 4 T_b_c1 rotation permutations |
-| ★ `scripts/experiments/test_extrinsic.sh` | Derived extrinsic testing from attitude + gimbal angles |
-
-### Repository Layout
-
-```
-├── docs/                                   # Run guides + calibration analysis
-├── Examples/Monocular/                     # AMtown mono configs (best + ablations)
-├── Examples/Monocular-Inertial/            # AMtown + TUM-VI inertial configs
-├── Examples/ROS/ORB_SLAM3/src/             # ROS nodes (incl. ★ original nodes)
-├── tools/                                  # Python analysis & extraction scripts
-├── scripts/experiments/                    # Extrinsic/rotation test suites
-├── calib_yaml/                             # Raw camera calibrations for all datasets
-├── data/
-│   ├── AMtown02_groundtruth.txt            # RTK GPS ground truth (TUM format)
-│   ├── ground_truth_sfm.txt                # SfM ground truth (TUM format, 6899 poses)
-│   └── TUM-VI/                             # TUM-VI GT + evaluation figures
-├── results/
-│   ├── amtown02/                           # Best trajectory (ATE 2.31m) + evo outputs
-│   ├── hkisland/                           # HKisland_GNSS03 evaluation
-│   └── tumvi/                              # TUM-VI VIO trajectories
-└── figures/                                # Sensor layout + presentation figures
-```
-
-## How to Run
-
-### Monocular VO — Offline (Recommended, Best Accuracy)
 ```bash
-# Step 1: Extract images from rosbag (0.5× downsampled to 1224×1024)
-python3 tools/extract_images.py  # outputs to data/AMtown02_offline/
+git clone https://github.com/AfonsoZhang/ORB-SLAM3-DJI-AMtown.git
+cd ORB-SLAM3-DJI-AMtown
+./build.sh                  # core library + offline examples
+./build_ros.sh              # ROS nodes (optional, for online mode)
+```
 
-# Step 2: Run offline mono_euroc
+Download `AMtown02.bag` from [MARS-LVIG](https://mars.hku.hk/dataset.html) into `data/`, then:
+
+```bash
+# 1. Extract 0.5× downsampled images (1224×1024)
+python3 tools/extract_images.py            # → data/AMtown02_offline/
+
+# 2. Run offline monocular VO (best accuracy)
 ./Examples/Monocular/mono_euroc \
   Vocabulary/ORBvoc.txt \
   Examples/Monocular/AMtown_Mono_MARSLVIG.yaml \
@@ -216,13 +92,17 @@ python3 tools/extract_images.py  # outputs to data/AMtown02_offline/
   data/AMtown02_offline/times.txt \
   AMtown02
 
-# Step 3: Convert timestamps and evaluate
+# 3. Evaluate against SfM ground truth
 awk '{printf "%.9f %s %s %s %s %s %s %s\n", $1/1e9, $2,$3,$4,$5,$6,$7,$8}' \
   f_AMtown02.txt > traj_sec.txt
 evo_ape tum data/ground_truth_sfm.txt traj_sec.txt --align --correct_scale --t_max_diff 0.1 -va
 ```
 
-### Monocular VO — Online (ROS)
+Expected result: ATE RMSE in the 2.3–2.9 m range (non-deterministic multi-threading).
+
+<details>
+<summary><b>Online ROS mode</b></summary>
+
 ```bash
 # Terminal 1
 roscore
@@ -233,8 +113,11 @@ rosrun ORB_SLAM3 Mono_Compressed Vocabulary/ORBvoc.txt Examples/Monocular/AMtown
 # Terminal 3
 rosbag play data/AMtown02.bag /left_camera/image/compressed:=/camera/image_raw/compressed --rate 0.5
 ```
+</details>
 
-### Virtual IMU Mono-Inertial (Experimental)
+<details>
+<summary><b>Virtual IMU mono-inertial (experimental, fails by design — see Finding 2)</b></summary>
+
 ```bash
 # Terminal 2 (replace Mono_Compressed with:)
 rosrun ORB_SLAM3 Mono_Inertial_VirtualIMU Vocabulary/ORBvoc.txt \
@@ -243,17 +126,18 @@ rosrun ORB_SLAM3 Mono_Inertial_VirtualIMU Vocabulary/ORBvoc.txt \
 # Terminal 3 (no topic remapping needed)
 rosbag play data/AMtown02.bag
 ```
+</details>
 
-### TUM-VI Mono-Inertial VIO (Validation)
+<details>
+<summary><b>TUM-VI VIO validation</b></summary>
+
 ```bash
 # Download TUM-VI dataset-room1_512_16 from https://vision.in.tum.de/data/datasets/visual-inertial-dataset
 # Extract to data/TUM-VI/dataset-room1_512_16/
 
-# Generate timestamps file
 awk -F',' 'NR>1 {print $1}' data/TUM-VI/dataset-room1_512_16/mav0/cam0/data.csv \
   > data/TUM-VI/dataset-room1_512_16/mav0/cam0/times.txt
 
-# Run Mono-Inertial
 ./Examples/Monocular-Inertial/mono_inertial_tum_vi \
   Vocabulary/ORBvoc.txt \
   Examples/Monocular-Inertial/TUM-VI.yaml \
@@ -262,27 +146,61 @@ awk -F',' 'NR>1 {print $1}' data/TUM-VI/dataset-room1_512_16/mav0/cam0/data.csv 
   data/TUM-VI/dataset-room1_512_16/mav0/imu0/data.csv \
   dataset-room1_512_16
 
-# Evaluate
 evo_ape tum data/TUM-VI/room1_groundtruth.txt data/TUM-VI/room1_estimated.txt --align --correct_scale -v
 ```
+</details>
 
-## Conclusion
+## Methodology
 
-Monocular VO with correct calibration achieves **ATE 2.3m** and **100% completeness** on the AMtown02 aerial mapping dataset, validated against both SfM and RTK GPS ground truth.
+1. **Ground truth extraction** — RTK GPS (`/dji_osdk_ros/gps_position`) + attitude topics from the rosbag, converted to local ENU in TUM format (`tools/extract_groundtruth.py`); a second, independent GT from the dataset's SfM reconstruction (`tools/sampleinfos_to_tum.py`).
+2. **Calibration investigation** — traced a 215 m ATE to mismatched intrinsics, then optimized distortion coefficients down to 2.3 m ([Finding 1](#finding-1--calibration-dominates-accuracy-215-m--23-m)).
+3. **ORB parameter tuning & ablations** — parameter sweep, k1 ablation series (`Examples/Monocular/ablation_k1_*.yaml`), full-resolution comparison, 5-run non-determinism analysis.
+4. **Mono-inertial investigation** — extrinsic permutation tests (`scripts/experiments/`), root-cause analysis of gimbal dynamics, Virtual IMU implementation ([Finding 2](#finding-2--why-vio-cannot-work-on-a-gimbal-a-negative-result)).
+5. **Dual-GT evaluation** — every trajectory scored against both SfM and RTK GPS ground truth with `evo` (`tools/evaluate_vo_accuracy.py`).
 
-**Key findings:**
+## Code Contributions
 
-1. **Camera calibration dominates accuracy**: Using the wrong dataset's intrinsics caused ATE 215m. Self-calibrated distortion gave 113m. Correct official calibration with optimized distortion achieved **2.3m**. ORB parameter tuning had minimal effect by comparison. See [Calibration Analysis](docs/CALIBRATION_ANALYSIS.md).
+Files marked ★ are original work for this project; everything else is upstream [ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3).
 
-2. **Mono-Inertial SLAM is infeasible** for gimbal-stabilized platforms: the DJI M300's gimbal creates a time-varying `T_b_c1` that violates ORB-SLAM3's fixed-extrinsic assumption. A novel Virtual IMU approach was developed but high-altitude downward-looking geometry provides insufficient parallax for visual-inertial scale estimation.
+| Area | Files |
+|------|-------|
+| **ROS nodes (C++)** | ★ `Examples/ROS/ORB_SLAM3/src/ros_mono_compressed.cc` (compressed images + 0.5× downsampling) · ★ `ros_mono_inertial_compressed.cc` (DJI IMU integration) · ★ `ros_mono_inertial_virtual_imu.cc` (**Virtual IMU** for time-varying extrinsics) |
+| **Configs** | ★ `Examples/Monocular/AMtown_Mono_MARSLVIG.yaml` (best, ATE 2.31m) · ★ `AMtown_Mono.yaml`, `AMtown_A–E.yaml`, `ablation_k1_*.yaml` (sensitivity series) · ★ `Examples/Monocular-Inertial/AMtown_MonoIMU.yaml` |
+| **Tools (Python)** | ★ `tools/extract_images.py`, `extract_fullres.py`, `extract_groundtruth.py`, `sampleinfos_to_tum.py`, `analyze_gimbal.py`, `evaluate_vo_accuracy.py` |
+| **Experiments (Bash)** | ★ `scripts/experiments/test_rotations.sh`, `test_extrinsic.sh` |
 
-3. **VIO pipeline validation** on TUM-VI benchmark achieved **ATE 0.011m** with true scale recovery (scale=0.999), confirming the AMtown failure is dataset-specific rather than algorithmic.
+## Repository Layout
 
-4. **Dual GT evaluation** using both SfM reconstruction and RTK GPS provides consistent ATE (~2.5m), with SfM GT offering more reliable RPE measurements.
+```
+├── docs/                          # Run guides + calibration analysis
+├── Examples/Monocular[-Inertial]/ # AMtown + TUM-VI configs (incl. ablation series)
+├── Examples/ROS/ORB_SLAM3/src/    # ROS nodes (incl. ★ original nodes)
+├── tools/                         # Python extraction / analysis / evaluation scripts
+├── scripts/experiments/           # Extrinsic & rotation test suites
+├── calib_yaml/                    # Raw camera calibrations for all datasets
+├── data/                          # Ground truths (TUM format); datasets go here (gitignored)
+├── results/                       # Best trajectories + evo outputs per dataset
+│   ├── amtown02/  ├── hkisland/  └── tumvi/
+└── figures/                       # Sensor layout + result figures
+```
+
+## Roadmap
+
+- Gimbal-aware VIO: support time-varying camera-body extrinsics ([#11](https://github.com/AfonsoZhang/ORB-SLAM3-DJI-AMtown/issues/11))
+- EuRoC MAV benchmark for an aerial-platform VIO validation ([#10](https://github.com/AfonsoZhang/ORB-SLAM3-DJI-AMtown/issues/10))
+- Mono VO vs. VIO cross-dataset comparison write-up ([#12](https://github.com/AfonsoZhang/ORB-SLAM3-DJI-AMtown/issues/12))
+
+## Acknowledgments
+
+Developed as the course project for **AAE5303 — Robust Control Technology in Low-Altitude Aerial Vehicle** at The Hong Kong Polytechnic University, by **ZHANG Shuyang**.
 
 ## References
 
 1. Campos, C., et al. (2021). ORB-SLAM3: An Accurate Open-Source Library for Visual, Visual-Inertial and Multi-Map SLAM. *IEEE TRO*, 37(6).
-2. [MARS-LVIG Dataset](https://mars.hku.hk/dataset.html)
+2. [MARS-LVIG Dataset](https://mars.hku.hk/dataset.html) — HKU MARS Lab aerial LiDAR-Visual-IMU-GNSS dataset.
 3. [ORB-SLAM3 (upstream)](https://github.com/UZ-SLAMLab/ORB_SLAM3)
-4. [TUM-VI Benchmark](https://vision.in.tum.de/data/datasets/visual-inertial-dataset) — Schubert, D., et al. (2018). The TUM VI Benchmark for Evaluating Visual-Inertial Odometry. *IROS*.
+4. Schubert, D., et al. (2018). [The TUM VI Benchmark](https://vision.in.tum.de/data/datasets/visual-inertial-dataset) for Evaluating Visual-Inertial Odometry. *IROS*.
+
+## License
+
+GPL-3.0, inherited from upstream ORB-SLAM3. See [LICENSE](LICENSE).
