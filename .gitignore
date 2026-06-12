@@ -23,7 +23,7 @@ Thirdparty/DBoW2/build/
 Thirdparty/g2o/build/
 Thirdparty/g2o/config.h
 Thirdparty/Sophus/build/
-Examples_old/ROS/ORB_SLAM3/build/
+Examples/ROS/ORB_SLAM3/build/
 
 # Compiled executables
 Examples/Monocular/mono_*
@@ -31,20 +31,15 @@ Examples/Stereo/stereo_*
 Examples/RGB-D/rgbd_*
 Examples/Monocular-Inertial/mono_inertial_*
 Examples/Stereo-Inertial/stereo_inertial_*
-Examples_old/Monocular/mono_*
-Examples_old/Stereo/stereo_*
-Examples_old/RGB-D/rgbd_*
-Examples_old/Monocular-Inertial/mono_inertial_*
-Examples_old/Stereo-Inertial/stereo_inertial_*
-Examples_old/ROS/ORB_SLAM3/Mono
-Examples_old/ROS/ORB_SLAM3/MonoAR
-Examples_old/ROS/ORB_SLAM3/Stereo
-Examples_old/ROS/ORB_SLAM3/RGBD
-Examples_old/ROS/ORB_SLAM3/Mono_Inertial
-Examples_old/ROS/ORB_SLAM3/Stereo_Inertial
-Examples_old/ROS/ORB_SLAM3/Mono_Compressed
-Examples_old/ROS/ORB_SLAM3/Mono_Inertial_Compressed
-Examples_old/ROS/ORB_SLAM3/Mono_Inertial_VirtualIMU
+Examples/ROS/ORB_SLAM3/Mono
+Examples/ROS/ORB_SLAM3/MonoAR
+Examples/ROS/ORB_SLAM3/Stereo
+Examples/ROS/ORB_SLAM3/RGBD
+Examples/ROS/ORB_SLAM3/Mono_Inertial
+Examples/ROS/ORB_SLAM3/Stereo_Inertial
+Examples/ROS/ORB_SLAM3/Mono_Compressed
+Examples/ROS/ORB_SLAM3/Mono_Inertial_Compressed
+Examples/ROS/ORB_SLAM3/Mono_Inertial_VirtualIMU
 
 # Large vocabulary (download separately)
 Vocabulary/ORBvoc.txt
@@ -69,3 +64,5 @@ PRESENTATION_SCRIPT.md
 PRESENTATION_SLIDES.md
 AAE5303*Essay*.pdf
 course_private/
+traj_sec.txt
+*.bag
