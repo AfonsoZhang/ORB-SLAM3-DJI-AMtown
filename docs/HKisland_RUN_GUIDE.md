@@ -34,7 +34,7 @@ roscore
 ```bash
 source /opt/ros/noetic/setup.bash
 cd /root/ORB_SLAM3
-./Examples_old/ROS/ORB_SLAM3/Mono_Compressed \
+./Examples/ROS/ORB_SLAM3/Mono_Compressed \
     Vocabulary/ORBvoc.txt \
     Examples/Monocular/HKisland_Mono.yaml
 ```
@@ -73,7 +73,7 @@ rosrun image_transport republish compressed raw \
 ```bash
 source /opt/ros/noetic/setup.bash
 cd /root/ORB_SLAM3
-./Examples_old/ROS/ORB_SLAM3/Mono \
+./Examples/ROS/ORB_SLAM3/Mono \
     Vocabulary/ORBvoc.txt \
     Examples/Monocular/HKisland_Mono.yaml
 ```
@@ -139,7 +139,7 @@ source /opt/ros/noetic/setup.bash
 
 ## 📁 文件位置
 
-- **可执行文件**: `/root/ORB_SLAM3/Examples_old/ROS/ORB_SLAM3/Mono_Compressed`
+- **可执行文件**: `/root/ORB_SLAM3/Examples/ROS/ORB_SLAM3/Mono_Compressed`
 - **词汇表**: `/root/ORB_SLAM3/Vocabulary/ORBvoc.txt`
 - **配置文件**: `/root/ORB_SLAM3/Examples/Monocular/HKisland_Mono.yaml`
 - **数据集**: `/root/ORB_SLAM3/data/HKisland_GNSS03.bag`

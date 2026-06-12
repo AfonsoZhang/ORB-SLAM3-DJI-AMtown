@@ -46,26 +46,26 @@ pip3 install evo --upgrade
 
 **Evaluate ATE (Absolute Trajectory Error):**
 ```bash
-evo_ape tum ground_truth.txt KeyFrameTrajectory.txt -va --align --correct_scale
+evo_ape tum data/HKisland_GNSS03_groundtruth.txt results/hkisland/KeyFrameTrajectory.txt -va --align --correct_scale
 ```
 
 **Evaluate RPE (Relative Pose Error):**
 ```bash
-evo_rpe tum ground_truth.txt KeyFrameTrajectory.txt -va --align --correct_scale
+evo_rpe tum data/HKisland_GNSS03_groundtruth.txt results/hkisland/KeyFrameTrajectory.txt -va --align --correct_scale
 ```
 
 **Generate plots:**
 ```bash
-evo_ape tum ground_truth.txt KeyFrameTrajectory.txt -va --align --correct_scale --plot --plot_mode xyz
+evo_ape tum data/HKisland_GNSS03_groundtruth.txt results/hkisland/KeyFrameTrajectory.txt -va --align --correct_scale --plot --plot_mode xyz
 ```
 
 ## File Structure
 
 ```
 /root/ORB_SLAM3/
-├── KeyFrameTrajectory.txt          # ORB_SLAM3 output trajectory (TUM format)
-├── ground_truth.txt                 # RTK ground truth (TUM format)
-├── FINAL_EVALUATION_RESULTS.txt    # Evaluation summary
+├── results/hkisland/KeyFrameTrajectory.txt          # ORB_SLAM3 output trajectory (TUM format)
+├── data/HKisland_GNSS03_groundtruth.txt                 # RTK ground truth (TUM format)
+├── results/hkisland/FINAL_EVALUATION_RESULTS.txt    # Evaluation summary
 └── HOW_TO_EVALUATE.md              # This guide
 ```
 
