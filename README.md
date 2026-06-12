@@ -69,36 +69,34 @@ Mono-inertial ORB-SLAM3 fails on this platform — **by design, not by bug**:
 
 ## Quick Start
 
-Prerequisites: the standard [ORB-SLAM3 dependencies](Dependencies.md) (Pangolin, OpenCV ≥ 4.4, Eigen3) plus ROS Noetic for the online nodes, and [`evo`](https://github.com/MichaelGrupp/evo) for evaluation. The `liangyu99/orbslam3_ros1` Docker image provides a working environment.
+### Docker (recommended)
 
 ```bash
 git clone https://github.com/AfonsoZhang/ORB-SLAM3-DJI-AMtown.git
 cd ORB-SLAM3-DJI-AMtown
-./build.sh                  # core library + offline examples
-./build_ros.sh              # ROS nodes (optional, for online mode)
+docker build -t orbslam3-dji-amtown .
+
+# Get AMtown02.bag into ./data/ first (instructions + checksum: scripts/download_dataset.sh)
+docker run --rm -v "$PWD/data":/work/ORB-SLAM3-DJI-AMtown/data orbslam3-dji-amtown \
+  bash -c "scripts/run_amtown.sh && scripts/evaluate.sh"
 ```
 
-Download `AMtown02.bag` from [MARS-LVIG](https://mars.hku.hk/dataset.html) into `data/`, then:
+The pipeline is fully headless — no X server or GPU needed. One-time image
+extraction takes ~10 min, the VO run ~13 min.
+
+### Native
+
+Prerequisites: Ubuntu 20.04, ROS Noetic, OpenCV 4.2, Eigen3, Pangolin v0.6, [`evo`](https://github.com/MichaelGrupp/evo) — exact recipe in the [Dockerfile](Dockerfile).
 
 ```bash
-# 1. Extract 0.5× downsampled images (1224×1024)
-python3 tools/extract_images.py            # → data/AMtown02_offline/
-
-# 2. Run offline monocular VO (best accuracy)
-./Examples/Monocular/mono_euroc \
-  Vocabulary/ORBvoc.txt \
-  Examples/Monocular/AMtown_Mono_MARSLVIG.yaml \
-  data/AMtown02_offline \
-  data/AMtown02_offline/times.txt \
-  AMtown02
-
-# 3. Evaluate against SfM ground truth
-awk '{printf "%.9f %s %s %s %s %s %s %s\n", $1/1e9, $2,$3,$4,$5,$6,$7,$8}' \
-  f_AMtown02.txt > traj_sec.txt
-evo_ape tum data/ground_truth_sfm.txt traj_sec.txt --align --correct_scale --t_max_diff 0.1 -va
+./build.sh                    # core library + offline examples
+./build_ros.sh                # ROS nodes (optional, for online mode)
+scripts/download_dataset.sh   # dataset instructions + checksum verification
+scripts/run_amtown.sh         # extract images + run monocular VO
+scripts/evaluate.sh           # evo ATE against both ground truths
 ```
 
-Expected result: ATE RMSE in the 2.3–2.9 m range (non-deterministic multi-threading).
+Expected result: ATE RMSE in the **2.3–2.9 m** range — see [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md) for the non-determinism analysis.
 
 <details>
 <summary><b>Online ROS mode</b></summary>
