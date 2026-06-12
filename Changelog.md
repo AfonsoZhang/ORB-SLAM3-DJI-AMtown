@@ -1,4 +1,22 @@
-# ORB-SLAM3
+# ORB-SLAM3-DJI-AMtown
+
+### v1.1.0, 12th June 2026 — Reproducibility & engineering overhaul
+
+- Repository restructured: `results/` per dataset, `docs/`, `tools/`, `scripts/`; ROS package moved to `Examples/ROS` (fixes `build_ros.sh`); legacy `Examples_old` and course-demo directories removed.
+- Salvaged previously uncommitted experiment material: k1 ablation configs, calibration variants A–E, full-resolution config and extractor, SfM sample-infos ground truth.
+- README rewritten as a project showcase (key findings, figures, roadmap).
+- Reproducible environment: `Dockerfile` (ROS Noetic + Pangolin v0.6), one-command `scripts/{download_dataset,run_amtown,evaluate}.sh` with dataset checksum; verified end-to-end in a fresh container (ATE 2.243 m vs SfM GT).
+- CI: GitHub Actions builds core library + ROS nodes and lints shell scripts.
+- Experiment conclusions consolidated in `docs/EXPERIMENTS.md`; reproduction protocol in `docs/REPRODUCIBILITY.md`.
+
+### v1.0-release — AAE5303 course submission
+
+- Monocular VO on AMtown02: ATE RMSE 2.310 m (SfM GT) / 2.647 m (RTK GPS GT), 100% completeness.
+- Gimbal time-varying extrinsics analysis; Virtual IMU mono-inertial investigation; TUM-VI VIO validation (ATE 0.011 m).
+
+---
+
+# ORB-SLAM3 (upstream)
 Details of changes between the different versions.
 
 ### V1.0, 22th December 2021
