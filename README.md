@@ -17,13 +17,14 @@ Evaluate and improve ORB-SLAM3 visual odometry on the **AMtown02** dataset from 
 | Metric | SfM GT | RTK GPS GT |
 |--------|--------|------------|
 | **ATE RMSE** | **2.310 m** | **2.647 m** |
+| **RPE Trans Drift** | 0.0103 m/m | 2.065 m/m (GPS noise) |
 | **Completeness** | 100% (6899/6899) | 98.7% (7402/7500) |
 | **Keyframes** | 1261 | — |
 | **Loop Closure** | Detected ✓ | — |
 
-> Evaluated against two independent ground truth sources: SfM reconstruction (from `sampleinfos_interpolated.json`) and RTK GPS. Consistent ATE (~2.5m) validates trajectory quality.
+> Evaluated against two independent ground truth sources: SfM reconstruction (from `sampleinfos_interpolated.json`) and RTK GPS. Consistent ATE (~2.5m) validates trajectory quality. Reported values are the best of 6 runs (ORB-SLAM3 multi-threading is non-deterministic; single runs typically fall in 2.3–2.9 m).
 
-**Key insight:** Correct camera calibration is the dominant factor for trajectory accuracy. Using the wrong dataset's intrinsics caused ATE 215m; self-calibrated distortion gave 113m; official calibration with optimized distortion achieved **2.3m**. See [Calibration Analysis](CALIBRATION_ANALYSIS.md) for details.
+**Key insight:** Correct camera calibration is the dominant factor for trajectory accuracy. Using the wrong dataset's intrinsics caused ATE 215m; self-calibrated distortion gave 113m; official calibration with optimized distortion achieved **2.3m**. See [Calibration Analysis](docs/CALIBRATION_ANALYSIS.md) for details.
 
 ### Research Findings — AMtown Mono-Inertial SLAM
 
@@ -81,7 +82,7 @@ Discovered that calibration accuracy dominates trajectory quality:
 | HK_GNSS official intrinsics + distortion | Correct intrinsics | 6.1 m |
 | **HK_GNSS intrinsics + HKisland distortion** | **Optimal distortion** | **2.3 m** |
 
-The initial 215m error was caused by using a different dataset's **intrinsics** (fx/fy/cx/cy mismatch). Subsequent improvements came from correcting the **distortion coefficients**. See [Calibration Analysis](CALIBRATION_ANALYSIS.md) for full investigation.
+The initial 215m error was caused by using a different dataset's **intrinsics** (fx/fy/cx/cy mismatch). Subsequent improvements came from correcting the **distortion coefficients**. See [Calibration Analysis](docs/CALIBRATION_ANALYSIS.md) for full investigation.
 
 ### Step 3: ORB Parameter Tuning & Ablation
 
@@ -93,21 +94,21 @@ Systematic experiments showed ORB parameters have minimal impact compared to cal
 | Tuned | 4000 | 12 | 8 | 113 m |
 | **Correct calibration** | **2000** | **8** | **15** | **2.3 m** |
 
-Full parameter sweep and non-determinism analysis documented in [CALIBRATION_ANALYSIS.md](CALIBRATION_ANALYSIS.md).
+Full parameter sweep and non-determinism analysis documented in [CALIBRATION_ANALYSIS.md](docs/CALIBRATION_ANALYSIS.md).
 
 ### Step 4: Mono-Inertial SLAM Investigation
 
 Created `ros_mono_inertial_compressed.cc` for IMU_MONOCULAR mode. Systematically tested:
 
-- **4 rotation permutations** for body-camera extrinsic `T_b_c1` (`test_rotations.sh`)
-- **Derived extrinsics** from drone attitude + gimbal angles at specific timestamps (`test_extrinsic.sh`)
+- **4 rotation permutations** for body-camera extrinsic `T_b_c1` (`scripts/experiments/test_rotations.sh`)
+- **Derived extrinsics** from drone attitude + gimbal angles at specific timestamps (`scripts/experiments/test_extrinsic.sh`)
 - **Topic remapping** corrections for DJI rosbag
 
 All attempts resulted in "Fail to track local map!" after Visual-Inertial BA.
 
 ### Step 5: Root Cause Analysis — Gimbal Problem
 
-Ran `data/analyze_gimbal.py` on the rosbag gimbal data and discovered (see [sensor layout](#platform--sensor-layout)):
+Ran `tools/analyze_gimbal.py` on the rosbag gimbal data and discovered (see [sensor layout](#platform--sensor-layout)):
 - Gimbal yaw changes **>100°** between survey legs
 - Even within a "constant" segment, body attitude changes cause **~7.5°** variation in `T_b_c1`
 - This exceeds ORB-SLAM3's tolerance for extrinsic calibration error
@@ -152,52 +153,52 @@ All files marked with ★ are **original work** created for this project. Other 
 
 | File | Description |
 |------|-------------|
-| ★ `Examples_old/ROS/ORB_SLAM3/src/ros_mono_compressed.cc` | Mono SLAM with compressed image subscription + 0.5× downsampling |
-| ★ `Examples_old/ROS/ORB_SLAM3/src/ros_mono_inertial_compressed.cc` | Mono-Inertial SLAM with compressed images + DJI IMU |
-| ★ `Examples_old/ROS/ORB_SLAM3/src/ros_mono_inertial_virtual_imu.cc` | **Virtual IMU** — transforms body-fixed IMU to camera frame using gimbal angles, solving dynamic extrinsics problem |
-| ★ `Examples_old/ROS/ORB_SLAM3/CMakeLists.txt` | Modified to build above executables |
+| ★ `Examples/ROS/ORB_SLAM3/src/ros_mono_compressed.cc` | Mono SLAM with compressed image subscription + 0.5× downsampling |
+| ★ `Examples/ROS/ORB_SLAM3/src/ros_mono_inertial_compressed.cc` | Mono-Inertial SLAM with compressed images + DJI IMU |
+| ★ `Examples/ROS/ORB_SLAM3/src/ros_mono_inertial_virtual_imu.cc` | **Virtual IMU** — transforms body-fixed IMU to camera frame using gimbal angles, solving dynamic extrinsics problem |
+| ★ `Examples/ROS/ORB_SLAM3/CMakeLists.txt` | Modified to build above executables |
 
 ### Configuration Files
 
 | File | Description |
 |------|-------------|
-| ★ `Examples/Monocular/AMtown_Mono_MARSLVIG.yaml` | **Best config** — MARS-LVIG official calibration (ATE 6.1m) |
+| ★ `Examples/Monocular/AMtown_Mono_MARSLVIG.yaml` | **Best config** — official calibration + optimized distortion (ATE 2.31m) |
 | ★ `Examples/Monocular/AMtown_Mono.yaml` | Self-calibrated config (for comparison, ATE 113m) |
+| ★ `Examples/Monocular/ablation_k1_*.yaml` | k1 distortion ablation series (ATE varies 46×) |
 | ★ `Examples/Monocular-Inertial/AMtown_MonoIMU.yaml` | AMtown Mono-Inertial config with IMU noise parameters + T_b_c1 |
 
 ### Analysis Scripts (Python / Bash)
 
 | File | Description |
 |------|-------------|
-| ★ `data/extract_groundtruth.py` | Extract GT from rosbag GPS + attitude → TUM format |
-| ★ `data/sampleinfos_to_tum.py` | Convert SfM GT (sampleinfos JSON) → TUM format |
-| ★ `data/analyze_gimbal.py` | Gimbal angle analysis — discovers time-varying T_b_c1 (root cause) |
-| ★ `test_rotations.sh` | Automated testing of 4 T_b_c1 rotation permutations |
-| ★ `test_extrinsic.sh` | Derived extrinsic testing from attitude + gimbal angles |
+| ★ `tools/extract_groundtruth.py` | Extract GT from rosbag GPS + attitude → TUM format |
+| ★ `tools/extract_images.py` | Extract 0.5× downsampled image sequence from rosbag |
+| ★ `tools/extract_fullres.py` | Extract full-resolution (2448×2048) image sequence |
+| ★ `tools/sampleinfos_to_tum.py` | Convert SfM GT (sampleinfos JSON) → TUM format |
+| ★ `tools/analyze_gimbal.py` | Gimbal angle analysis — discovers time-varying T_b_c1 (root cause) |
+| ★ `tools/evaluate_vo_accuracy.py` | ATE/RPE evaluation pipeline (JSON report) |
+| ★ `scripts/experiments/test_rotations.sh` | Automated testing of 4 T_b_c1 rotation permutations |
+| ★ `scripts/experiments/test_extrinsic.sh` | Derived extrinsic testing from attitude + gimbal angles |
 
-### ORB-SLAM3 Source Modifications
-
-| File | Change |
-|------|--------|
-| `src/Tracking.cc` | Upstream file — studied thresholds for tracking failure analysis |
-
-### Data & Results
+### Repository Layout
 
 ```
-├── figures/
-│   ├── sensor_layout.png                   # DJI M300 sensor layout diagram
-│   └── trajectory_evaluation.png           # Trajectory comparison plot
-├── data/TUM-VI/
-│   ├── room1_groundtruth.txt               # TUM-VI mocap GT (TUM format, 16541 poses)
-│   ├── room1_estimated.txt                 # VIO estimated trajectory (2704 poses)
-│   └── figures/                            # evo evaluation plots (ATE, RPE, trajectory)
+├── docs/                                   # Run guides + calibration analysis
+├── Examples/Monocular/                     # AMtown mono configs (best + ablations)
+├── Examples/Monocular-Inertial/            # AMtown + TUM-VI inertial configs
+├── Examples/ROS/ORB_SLAM3/src/             # ROS nodes (incl. ★ original nodes)
+├── tools/                                  # Python analysis & extraction scripts
+├── scripts/experiments/                    # Extrinsic/rotation test suites
 ├── calib_yaml/                             # Raw camera calibrations for all datasets
-├── AMtown02_groundtruth.txt                # RTK GPS ground truth (TUM format)
-├── data/ground_truth_sfm.txt              # SfM ground truth (TUM format, 6899 poses)
-├── CameraTrajectory.txt                    # Best Mono VO result (ATE 6.1m)
-├── evaluation_results_AMtown02/            # evo evaluation outputs + dual GT comparison
-├── CALIBRATION_ANALYSIS.md                # Calibration sensitivity & parameter tuning report
-└── AAE5303_assignment2_orbslam3_demo/      # Evaluation scripts (provided)
+├── data/
+│   ├── AMtown02_groundtruth.txt            # RTK GPS ground truth (TUM format)
+│   ├── ground_truth_sfm.txt                # SfM ground truth (TUM format, 6899 poses)
+│   └── TUM-VI/                             # TUM-VI GT + evaluation figures
+├── results/
+│   ├── amtown02/                           # Best trajectory (ATE 2.31m) + evo outputs
+│   ├── hkisland/                           # HKisland_GNSS03 evaluation
+│   └── tumvi/                              # TUM-VI VIO trajectories
+└── figures/                                # Sensor layout + presentation figures
 ```
 
 ## How to Run
@@ -205,7 +206,7 @@ All files marked with ★ are **original work** created for this project. Other 
 ### Monocular VO — Offline (Recommended, Best Accuracy)
 ```bash
 # Step 1: Extract images from rosbag (0.5× downsampled to 1224×1024)
-python3 data/extract_images.py  # outputs to data/AMtown02_offline/
+python3 tools/extract_images.py  # outputs to data/AMtown02_offline/
 
 # Step 2: Run offline mono_euroc
 ./Examples/Monocular/mono_euroc \
@@ -218,7 +219,7 @@ python3 data/extract_images.py  # outputs to data/AMtown02_offline/
 # Step 3: Convert timestamps and evaluate
 awk '{printf "%.9f %s %s %s %s %s %s %s\n", $1/1e9, $2,$3,$4,$5,$6,$7,$8}' \
   f_AMtown02.txt > traj_sec.txt
-evo_ape tum data/ground_truth_sfm.txt traj_sec.txt --align --correct_scale -va
+evo_ape tum data/ground_truth_sfm.txt traj_sec.txt --align --correct_scale --t_max_diff 0.1 -va
 ```
 
 ### Monocular VO — Online (ROS)
@@ -271,7 +272,7 @@ Monocular VO with correct calibration achieves **ATE 2.3m** and **100% completen
 
 **Key findings:**
 
-1. **Camera calibration dominates accuracy**: Using the wrong dataset's intrinsics caused ATE 215m. Self-calibrated distortion gave 113m. Correct official calibration with optimized distortion achieved **2.3m**. ORB parameter tuning had minimal effect by comparison. See [Calibration Analysis](CALIBRATION_ANALYSIS.md).
+1. **Camera calibration dominates accuracy**: Using the wrong dataset's intrinsics caused ATE 215m. Self-calibrated distortion gave 113m. Correct official calibration with optimized distortion achieved **2.3m**. ORB parameter tuning had minimal effect by comparison. See [Calibration Analysis](docs/CALIBRATION_ANALYSIS.md).
 
 2. **Mono-Inertial SLAM is infeasible** for gimbal-stabilized platforms: the DJI M300's gimbal creates a time-varying `T_b_c1` that violates ORB-SLAM3's fixed-extrinsic assumption. A novel Virtual IMU approach was developed but high-altitude downward-looking geometry provides insufficient parallax for visual-inertial scale estimation.
 
