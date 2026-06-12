@@ -62,3 +62,10 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Course-private files (never publish)
+REFLECTIVE_ESSAY.md
+PRESENTATION_SCRIPT.md
+PRESENTATION_SLIDES.md
+AAE5303*Essay*.pdf
+course_private/
