@@ -1,0 +1,56 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters for AMtown Dataset - Full Resolution (2448x2048)
+#--------------------------------------------------------------------------------------------
+File.version: "1.0"
+
+Camera.type: "PinHole"
+
+# Original AMtown calibration at full resolution
+Camera1.fx: 1453.72
+Camera1.fy: 1453.28
+Camera1.cx: 1172.18
+Camera1.cy: 1041.78
+
+Camera1.k1: -0.1210
+Camera1.k2: 0.1113
+Camera1.p1: 0.0016
+Camera1.p2: 0.00013
+Camera1.k3: -0.062353
+
+Camera.width: 2448
+Camera.height: 2048
+
+Camera.fps: 10
+
+Camera.RGB: 1
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters (scaled for full resolution 2448x2048)
+#--------------------------------------------------------------------------------------------
+
+ORBextractor.nFeatures: 8000
+
+ORBextractor.scaleFactor: 1.2
+
+ORBextractor.nLevels: 12
+
+ORBextractor.iniThFAST: 8
+ORBextractor.minThFAST: 3
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500.0
+Viewer.imageViewScale: 1.0
+
