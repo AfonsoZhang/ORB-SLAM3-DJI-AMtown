@@ -1,0 +1,35 @@
+evo evaluation: sampleinfos TUM GT vs CameraTrajectory.txt
+Protocol: tum, --align --correct_scale --t_max_diff 0.1
+GT: data/ground_truth_sampleinfos_tum.txt (6899 poses)
+Est: CameraTrajectory.txt (7419 poses)
+Matched: 6899 / 6899 GT poses (100%)
+
+--- APE (translation, Sim(3)) ---
+rmse:   164.750898 m
+mean:   145.566062 m
+median: 121.129291 m
+std:     77.158149 m
+min:     22.843630 m
+max:    465.207389 m
+Scale correction (Umeyama): 0.3326500201
+
+--- RPE delta = 10 m, translation ---
+mean:   10.009922 m
+rmse:   38.691529 m
+median:  4.129234 m
+pairs: 371
+
+--- RPE delta = 10 m, rotation (deg) ---
+mean:   3.427398 deg
+rmse:   7.153752 deg
+median: 2.018702 deg
+
+--- Leaderboard-style (if using same formulas as VisLangFly README) ---
+completeness_pct:     100.0  (6899/6899)
+rpe_trans_drift_m_per_m:     ~1.001  (= mean_trans/10)
+rpe_rot_drift_deg_per_100m:  ~34.27   (= mean_rot_deg/10*100)
+
+Commands:
+  evo_ape tum data/ground_truth_sampleinfos_tum.txt CameraTrajectory.txt --align --correct_scale --t_max_diff 0.1 -va
+  evo_rpe tum ... --delta 10 --delta_unit m --pose_relation trans_part -va
+  evo_rpe tum ... --delta 10 --delta_unit m --pose_relation angle_deg -va
